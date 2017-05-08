@@ -61,22 +61,25 @@ int progress_callback(void   *clientp,
 	if ((now > stats->next) && (remain != stats->remain)) {
 		stats->next = now + 1000;
 		stats->remain = remain;
-		Genode::log(stats->url, ": ", remain, " bytes remain");
+		Genode::log(stats->url, ": ", remain / 1024, " KiB remain");
 	}
 	return CURLE_OK;
 }
 
-void Libc::Component::construct(Genode::Env &env)
+
+void Libc::Component::construct(Libc::Env &env)
 {
 	Genode::Attached_rom_dataspace config(env, "config");
 
 	Timer::Connection timer(env);
-	/* wait for DHCP */
+	Genode::log("wait for DHCP");
 	timer.msleep(4000);
 
 	Genode::String<256> url;
 	Genode::Path<256>   path;
 	CURLcode res = CURLE_OK;
+
+	Libc::with_libc([&] {
 
 	curl_global_init(CURL_GLOBAL_DEFAULT);
 
@@ -153,6 +156,8 @@ void Libc::Component::construct(Genode::Env &env)
 	curl_global_cleanup();
 
 	Genode::warning("SSL certificates not verified");
+
+	});
 
 	env.parent().exit(res ^ CURLE_OK);
 }
