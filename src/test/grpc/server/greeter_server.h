@@ -1,4 +1,4 @@
 #pragma once
 
-void RunServer(const char* server_address);
+void RunServer(Genode::Env& env, const char* server_address);
 

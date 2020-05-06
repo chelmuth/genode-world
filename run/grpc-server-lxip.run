@@ -21,18 +21,11 @@
 create_boot_directory
 
 
-import_from_depot [depot_user]/src/[base_src]
 import_from_depot [depot_user]/src/init
-import_from_depot [depot_user]/src/libc
-import_from_depot [depot_user]/src/libcrypto
 import_from_depot [depot_user]/src/nic_router
 import_from_depot [depot_user]/src/posix
-import_from_depot [depot_user]/src/protobuf
-import_from_depot [depot_user]/src/libssl
 import_from_depot [depot_user]/src/report_rom
-import_from_depot [depot_user]/src/stdcxx
 import_from_depot [depot_user]/src/vfs
-import_from_depot [depot_user]/src/vfs_lxip
 import_from_depot [depot_user]/src/zlib
 
 
@@ -70,7 +63,7 @@ set config {
 append config {
 
 	<start name="grpc_server" caps="200">
-		<resource name="RAM" quantum="96M"/>
+		<resource name="RAM" quantum="50M"/>
 		<config server_address="0.0.0.0:8899">
 			<arg value="grpc_server"/>
 			<libc stdout="/dev/log" stderr="/dev/log" rtc="/dev/rtc" socket="/dev/socket"/>
@@ -139,12 +132,24 @@ append config {
 install_config $config
 
 
+build { test/grpc/server core timer }
+
 set boot_modules {
+	core
+	ld.lib.so
+	timer
 	grpc_server
 	grpc.lib.so
 	libc_pipe.lib.so
-	vfs_lwip.lib.so
+	vfs_lxip.lib.so
+	lxip.lib.so
+	stdcxx.lib.so
+	libc.lib.so
+	libm.lib.so
+	libcrypto.lib.so
+	libssl.lib.so
 	linux_nic_drv
+	protobuf.lib.so
 }
 
 

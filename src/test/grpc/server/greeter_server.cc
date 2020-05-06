@@ -19,7 +19,10 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <unistd.h>
 
+#include <base/lock.h>
+#include <base/lock_guard.h>
 #include <grpcpp/grpcpp.h>
 
 #ifdef BAZEL_BUILD
@@ -28,6 +31,8 @@
 #include "helloworld.grpc.pb.h"
 #endif
 
+#include <libc/component.h>
+#include <timer_session/connection.h>
 #include "greeter_server.h"
 
 using grpc::Server;
@@ -40,17 +45,37 @@ using helloworld::Greeter;
 
 // Logic and data behind the server's behavior.
 class GreeterServiceImpl final : public Greeter::Service {
+
+		Genode::Env& _env;
+		unsigned int _next_session_id { 0 };
+		Genode::Lock _session_id_lock { };
+
+		unsigned int _get_session_id()
+		{
+			Genode::Lock_guard guard { _session_id_lock };
+			++_next_session_id;
+			return _next_session_id;
+		}
+
   Status SayHello(ServerContext* context, const HelloRequest* request,
                   HelloReply* reply) override {
-		printf("say hello\n");
-    std::string prefix("Hello ");
+    printf("say hello num=%u\n", _get_session_id());
+    std::string prefix(50000, 'a');
     reply->set_message(prefix + request->name());
+		Timer::Connection timer(_env);
+		timer.msleep(500);
     return Status::OK;
   }
+
+	public:
+		GreeterServiceImpl(Genode::Env& env)
+			: _env(env)
+		{
+		}
 };
 
-void RunServer(const char* server_address) {
-  GreeterServiceImpl service;
+void RunServer(Genode::Env& env, const char* server_address) {
+  GreeterServiceImpl service(env);
 
   ServerBuilder builder;
   // Listen on the given address without any authentication mechanism.

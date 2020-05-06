@@ -6,7 +6,6 @@ LIBS               += protobuf
 LIBS               += stdcxx
 LIBS               += grpc
 LIBS               += vfs
-LIBS               += vfs_lwip
 
 CC_CXX_WARN_STRICT :=
 

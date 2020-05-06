@@ -6,8 +6,6 @@
 #include <pthread.h>
 #include "greeter_server.h"
 
-enum { STACK_SIZE = 0xF000 };
-
 namespace Grpc_server {
 	using namespace Genode;
 
@@ -20,7 +18,7 @@ static void *start_func(void* envp)
 	Genode::Attached_rom_dataspace config { env, "config" };
 	Genode::String<256> server_address = config.xml().attribute_value("server_address", Genode::String<256>("0.0.0.0:8899"));
 	Libc::with_libc([&] () {
-		RunServer(server_address.string());
+		RunServer(env, server_address.string());
 	});
 
 	return nullptr;
