@@ -127,6 +127,7 @@ install_config $config
 
 
 set build_components {
+	lib/vfs/lwip
 	drivers/nic
 	test/grpc/server
 	core
