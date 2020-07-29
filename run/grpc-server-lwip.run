@@ -29,14 +29,6 @@ import_from_depot [depot_user]/src/vfs
 import_from_depot [depot_user]/src/zlib
 
 
-set build_components {
-	drivers/nic
-	test/grpc/server
-}
-
-
-build $build_components
-
 
 set nic_router_reporting 0
 
@@ -134,7 +126,15 @@ append config {
 install_config $config
 
 
-build { test/grpc/server core timer }
+set build_components {
+	drivers/nic
+	test/grpc/server
+	core
+	timer
+}
+
+
+build $build_components
 
 set boot_modules {
 	core
@@ -142,7 +142,6 @@ set boot_modules {
 	timer
 	grpc_server
 	grpc.lib.so
-	libc_pipe.lib.so
 	vfs_lwip.lib.so
 	stdcxx.lib.so
 	libc.lib.so
