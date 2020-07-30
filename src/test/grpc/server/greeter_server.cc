@@ -48,11 +48,11 @@ class GreeterServiceImpl final : public Greeter::Service {
 
 		Genode::Env& _env;
 		unsigned int _next_session_id { 0 };
-		Genode::Lock _session_id_lock { };
+		Genode::Mutex _session_id_mutex { };
 
 		unsigned int _get_session_id()
 		{
-			Genode::Lock_guard guard { _session_id_lock };
+			Genode::Mutex::Guard guard { _session_id_mutex };
 			++_next_session_id;
 			return _next_session_id;
 		}
