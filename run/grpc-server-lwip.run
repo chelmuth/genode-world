@@ -26,6 +26,7 @@ import_from_depot [depot_user]/src/nic_router
 import_from_depot [depot_user]/src/posix
 import_from_depot [depot_user]/src/report_rom
 import_from_depot [depot_user]/src/vfs
+import_from_depot [depot_user]/src/vfs_pipe
 import_from_depot [depot_user]/src/zlib
 
 
@@ -60,7 +61,7 @@ append config {
 			<arg value="grpc_server"/>
 			<env key="GRPC_VERBOSITY" value="debug"/>
 			<env key="GRPC_TRACE" value="tcp,http"/>
-			<libc stdout="/dev/log" stderr="/dev/log" rtc="/dev/rtc" socket="/dev/socket"/>
+			<libc stdout="/dev/log" stderr="/dev/log" rtc="/dev/rtc" socket="/dev/socket" pipe="/dev/pipe"/>
 			<vfs>
 				<dir name="dev">
 					<log/> <null/>
@@ -68,6 +69,7 @@ append config {
 					<dir name="socket">
 						<lwip ip_addr="10.0.3.2" netmask="255.255.255.0" gateway="10.0.3.1"/>
 					</dir>
+					<dir name="pipe"> <pipe/> </dir>
 				</dir>
 			</vfs>
 		</config>
