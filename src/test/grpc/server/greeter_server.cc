@@ -21,8 +21,7 @@
 #include <string>
 #include <unistd.h>
 
-#include <base/lock.h>
-#include <base/lock_guard.h>
+#include <base/mutex.h>
 #include <grpcpp/grpcpp.h>
 
 #ifdef BAZEL_BUILD
@@ -63,8 +62,7 @@ class GreeterServiceImpl final : public Greeter::Service {
     printf("say hello num=%u\n", _get_session_id());
     std::string prefix(50000, 'a');
     reply->set_message(prefix + request->name());
-		Timer::Connection timer(_env);
-		timer.msleep(500);
+//    usleep(500'000);
     return Status::OK;
   }
 

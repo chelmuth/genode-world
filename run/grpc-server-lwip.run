@@ -7,28 +7,30 @@
 #
 # sudo ip tuntap add dev $tapdev mode tap user $user
 # sudo ip address flush dev $tapdev
-# sudo ip address add 10.0.2.1/24 brd 10.0.2.255 dev $tapdev
+# sudo ip address add 10.0.11.1/24 brd 10.0.11.255 dev $tapdev
 # sudo ip link set dev $tapdev addr 02:00:00:ca:fe:01
 # sudo ip link set dev $tapdev up
 #
 # connect using your favorite grpc client
 # E.g. https://github.com/sidhussmann/grpc-connection-stress
-# ./stress_grpc.sh 10.0.2.55:8899
+# ./stress_grpc.sh 10.0.11.55:8899
 
 
 
 
 create_boot_directory
 
+set depot_archives { }
 
-import_from_depot [depot_user]/src/init
-import_from_depot [depot_user]/src/nic_router
-import_from_depot [depot_user]/src/posix
-import_from_depot [depot_user]/src/report_rom
-import_from_depot [depot_user]/src/vfs
-import_from_depot [depot_user]/src/vfs_pipe
-import_from_depot [depot_user]/src/zlib
+lappend depot_archives [depot_user]/src/init
+lappend depot_archives [depot_user]/src/nic_router
+lappend depot_archives [depot_user]/src/posix
+lappend depot_archives [depot_user]/src/report_rom
+lappend depot_archives [depot_user]/src/vfs
+lappend depot_archives [depot_user]/src/vfs_pipe
+lappend depot_archives [depot_user]/src/zlib
 
+import_from_depot $depot_archives
 
 
 set nic_router_reporting 0
@@ -67,18 +69,19 @@ append config {
 					<log/> <null/>
 					<inline name="rtc">2000-01-01 00:00</inline>
 					<dir name="socket">
-						<lwip ip_addr="10.0.3.2" netmask="255.255.255.0" gateway="10.0.3.1"/>
+						<lwip ip_addr="10.0.11.55" netmask="255.255.255.0" gateway="10.0.11.1"/>
 					</dir>
 					<dir name="pipe"> <pipe/> </dir>
 				</dir>
 			</vfs>
 		</config>
 		<route>
-			<service name="Nic"> <child name="nic_router" label="grpc2tee -> "/> </service>
+			<service name="Nic"> <child name="nic_drv" label="grpc2tee -> "/> </service>
 			<any-service> <parent/> <any-child/> </any-service>
 		</route>
 	</start>
 
+<!--
 	<start name="nic_router">
 		<resource name="RAM" quantum="16M"/>
 		<provides><service name="Nic"/></provides>
@@ -89,7 +92,7 @@ append config {
 			<policy label="grpc2tee -> " domain="server"/>
 			<uplink                                 domain="uplink"/>
 
-			<domain name="uplink" interface="10.0.2.55/24" gateway="10.0.2.1">
+			<domain name="uplink" interface="10.0.11.55/24" gateway="10.0.11.1">
 				<nat domain="server" tcp-ports="100" />
 				<tcp-forward port="8899" domain="server" to="10.0.3.2" />
 			</domain>
@@ -106,6 +109,7 @@ append config {
 			<any-service> <parent/> <any-child/> </any-service>
 		</route>
 	</start>
+-->
 
 	<start name="nic_drv" ld="no">
 		<binary name="linux_nic_drv"/>
@@ -114,7 +118,7 @@ append config {
 			<service name="Nic"/>
 		</provides>
 		<config>
-			<nic mac="02:00:00:00:00:01" tap="tap0"/>
+			<nic mac="02:00:00:00:77:01" tap="tap_goa"/>
 		</config>
 		<route>
 			<any-service> <parent/> </any-service>
