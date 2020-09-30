@@ -37,6 +37,7 @@
 
 using grpc::Server;
 using grpc::ServerBuilder;
+using grpc::ResourceQuota;
 using grpc::ServerContext;
 using grpc::Status;
 using helloworld::HelloRequest;
@@ -78,6 +79,10 @@ void RunServer(Genode::Env& env, const char* server_address) {
   GreeterServiceImpl service(env);
 
   ServerBuilder builder;
+  ResourceQuota quota;
+  quota.SetMaxThreads(32);
+  builder.SetResourceQuota(quota);
+  builder.AddChannelArgument(GRPC_ARG_MAX_CONCURRENT_STREAMS, 24);
   // Listen on the given address without any authentication mechanism.
   builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
   // Register "service" as the instance through which we'll communicate with
