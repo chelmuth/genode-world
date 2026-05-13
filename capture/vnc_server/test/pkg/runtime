@@ -3,18 +3,16 @@ runtime | ram: 250M | caps: 2000 | binary: init
   + capture
   + event
   + gui
-  + nic
-  | + policy | label_suffix: vnc | domain: vnc
-  | + domain vnc | interface: 10.0.59.1/24
-  | | + dhcp-server
-  | |               ip_first:        10.0.59.2
-  | |               ip_last:         10.0.59.2
-  | |               dns_config_from: uplink
-  | + tcp-forward | port: 5900 | domain: vnc | to: 10.0.59.2
-  + fs
+  + nic vnc
+  | + tcp-forward | port: 5900 | domain: default | to: 10.0.10.2
+  + fs font
+  + fs model
+  + fs target
+  + fs report
   + report shape
   + report clipboard
   + rom clipboard
+  + rom vimrc
   + rom mesa_gpu.lib.so
   + timer
 + content
@@ -43,18 +41,25 @@ runtime | ram: 250M | caps: 2000 | binary: init
   |   + any-service
   |     + parent
   |     + any-child
-  + start textedit | ram: 100M
+  + start system_shell | ram: 200M | caps: 1000
+    + binary init
     + route
       + service ROM | label: config
-      | + parent | label: textedit.config
-      + service ROM | label: mesa_gpu.lib.so
-      | + parent | label: mesa_gpu.lib.so
+      | + parent | label: system_shell.config
+      + service ROM | label: vimrc
+      | + parent | label: vimrc
       + service ROM | label: clipboard
       | + parent | label: clipboard
       + service Report | label: clipboard
       | + parent | label: clipboard
-      + service Report | label: shape
-      | + parent | label: shape
+      + service File_system | label_prefix: font ->
+      | + parent | identity: font
+      + service File_system | label_prefix: target ->
+      | + parent | identity: target
+      + service File_system | label_prefix: model ->
+      | + parent | identity: model
+      + service File_system | label_prefix: report ->
+      | + parent | identity: report
       + any-service
         + parent
         + any-child
