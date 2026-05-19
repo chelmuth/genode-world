@@ -13,7 +13,7 @@ libraries, and games.
 
 To use it, you first need to obtain a clone of Genode:
 
-! git clone https://github.com/genodelabs/genode.git genode
+! git clone https://codeberg.org/genodelabs/genode.git genode
 
 Now, clone the _genode-world.git_ repository to _genode/repos/world_:
 
