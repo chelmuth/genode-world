@@ -4,3 +4,4 @@ ac_cv_lib_pthread_pthread_create=yes
 --disable-uuid
 --disable-fmhttp
 --enable-imfile
+--enable-openssl
