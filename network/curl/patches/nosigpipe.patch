@@ -1,0 +1,10 @@
++++ src/lib/curl_setup.h	2026-05-28 16:37:39.717320074 +0200
+@@ -477,7 +477,7 @@
+ #define USE_EVENTFD
+ #endif
+ 
+-#ifdef SO_NOSIGPIPE
++#if defined(SO_NOSIGPIPE) && !defined(__GENODE__)
+ #define USE_SO_NOSIGPIPE
+ #endif
+ 

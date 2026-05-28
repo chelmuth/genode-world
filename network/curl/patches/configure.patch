@@ -1,0 +1,15 @@
++++ src/configure	2025-02-26 08:48:14.392438826 +0100
+@@ -16051,6 +16055,13 @@
+   shlibpath_var=LD_LIBRARY_PATH
+   ;;
+ 
++genode*)
++  dynamic_linker="Genode ld.lib.so"
++  shrext_cmds=.lib.so
++  libname_spec='$name'
++  library_names_spec='$libname$shared_ext'
++  ;;
++
+ *)
+   dynamic_linker=no
+   ;;

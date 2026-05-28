@@ -1,0 +1,13 @@
++++ src/src/tool_xattr.h	2026-05-26 11:38:25.317516369 +0200
+@@ -28,11 +28,6 @@
+ #ifdef HAVE_FSETXATTR
+ #  include <sys/xattr.h> /* header from libc, not from libattr */
+ #  define USE_XATTR
+-#elif (defined(__FreeBSD_version) && (__FreeBSD_version > 500000)) || \
+-  defined(__MidnightBSD_version)
+-#  include <sys/types.h>
+-#  include <sys/extattr.h>
+-#  define USE_XATTR
+ #endif
+ 
+ #ifdef USE_XATTR

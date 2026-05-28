@@ -1,0 +1,19 @@
+LICENSE   := curl
+DOWNLOADS := curl.archive
+VERSION   := 8.21.0
+
+URL(curl) := https://curl.se/download/curl-$(VERSION).tar.gz
+SHA(curl) := d9b327997999045a24cda50f3983e69e51c516bd8be6ef9842fc7f99135e33bb
+DIR(curl) := src
+
+PATCHES   := $(addprefix patches/,max_write_size.patch \
+                                  xattr.patch \
+                                  nosigpipe.patch \
+                                  link_libcurl_static.patch \
+                                  configure.patch \
+                                  libcurl.pc.patch)
+
+_dirs: $(DOWNLOADS) additional_steps
+
+additional_steps:
+	$(VERBOSE)rm src/CMakeLists.txt src/src/tool_hugehelp.c
