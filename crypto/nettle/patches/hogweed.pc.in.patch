@@ -19,4 +19,4 @@
 -Libs.private: @IF_SHARED@ @LIBS@
 -Cflags: -I${includedir}
 -
-+Libs: 
++Libs: -l:nettle.lib.so

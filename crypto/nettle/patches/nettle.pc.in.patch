@@ -12,4 +12,4 @@
  Version: @PACKAGE_VERSION@
 -Libs: -L${libdir} -lnettle
 -Cflags: -I${includedir}
-+Libs: 
++Libs: -l:nettle.lib.so
