@@ -1,0 +1,10 @@
++++ src/src/Makefile.in
+@@ -366,7 +366,7 @@
+ curl_DEPENDENCIES = $(top_builddir)/lib/libcurl.la
+ curl_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+ 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+-	$(curl_LDFLAGS) $(LDFLAGS) -o $@
++	$(curl_LDFLAGS) $(LDFLAGS) -static-libtool-libs -o $@
+ am_curlinfo_OBJECTS = curlinfo.$(OBJEXT)
+ curlinfo_OBJECTS = $(am_curlinfo_OBJECTS)
+ curlinfo_LDADD = $(LDADD)

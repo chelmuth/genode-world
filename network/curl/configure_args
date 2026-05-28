@@ -1,0 +1,6 @@
+--with-ca-path=/etc/ssl/certs
+--with-ca-bundle=/etc/ssl/certs/ca-certificates.crt
+--without-libpsl
+--host=x86_64-pc-genode
+--with-openssl
+--with-zlib
