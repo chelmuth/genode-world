@@ -15,4 +15,4 @@
 +	$(CC) $(MAKE_SHARED_LINKER_FLAGS) $< -o $@
 +
 +sqlite.o: sqlite3.c
-+	$(CC) -DSQLITE_ENABLE_RTREE $(CFLAGS) -c $< -o $@
++	$(CC) -DSQLITE_ENABLE_RTREE -DSQLITE_OMIT_WAL $(CFLAGS) -c $< -o $@
