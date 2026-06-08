@@ -1,0 +1,41 @@
+Remove hardcoded -lcrypto -lz to prevent the linking from failing
+as both libraries are pulled in via 'used_apis' anyway.
++++ src/configure	2025-09-18 17:33:22.945764608 +0200
+@@ -13680,7 +13680,7 @@
+ printf "%s\n" "no" >&6; }
+ else
+     saved_LIBS="$LIBS"
+-    CHANNELLIBS="$CHANNELLIBS -lz"
++    CHANNELLIBS="$CHANNELLIBS "
+     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+ printf "%s\n" "yes" >&6; }
+ 
+@@ -13701,7 +13701,7 @@
+   printf %s "(cached) " >&6
+ else $as_nop
+   ac_check_lib_save_LIBS=$LIBS
+-LIBS="-lz  $LIBS"
++LIBS="$LIBS"
+ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */
+ 
+@@ -13733,7 +13733,7 @@
+ then :
+   printf "%s\n" "#define HAVE_LIBZ 1" >>confdefs.h
+ 
+-  LIBS="-lz $LIBS"
++  LIBS="$LIBS"
+ 
+ else $as_nop
+ 
+@@ -18599,8 +18599,8 @@
+ 
+ nocrypto_saved_LIBS="$LIBS"
+ if test "x$openssl" = "xyes" ; then
+-	LIBS="-lcrypto $LIBS"
+-	CHANNELLIBS="-lcrypto $CHANNELLIBS"
++	LIBS="$LIBS"
++	CHANNELLIBS="$CHANNELLIBS"
+ 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */
+ 

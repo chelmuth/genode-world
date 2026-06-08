@@ -1,0 +1,13 @@
+Remove for now as it leads to a compile error and rely on OpenSSL
+doing its magic.
+--- src/entropy.c
++++ src/entropy.c
+@@ -117,7 +117,7 @@
+ #ifdef WITH_OPENSSL
+ 	RAND_poll();
+ #endif
+-	arc4random_stir(); /* noop on recent arc4random() implementations */
++	// arc4random_stir(); /* noop on recent arc4random() implementations */
+ 	arc4random_buf(rnd, sizeof(rnd)); /* let arc4random notice PID change */
+ 
+ #ifdef WITH_OPENSSL

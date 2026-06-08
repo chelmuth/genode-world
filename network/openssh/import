@@ -1,0 +1,13 @@
+LICENSE   := BSD
+VERSION   := 10.3p1
+DOWNLOADS := openssh.archive
+
+BASE_URL := https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable
+URL(openssh) := $(BASE_URL)/openssh-$(VERSION).tar.gz
+SHA(openssh) := 56682a36bb92dcf4b4f016fd8ec8e74059b79a8de25c15d670d731e7d18e45f4
+DIR(openssh) := src
+
+PATCHES := \
+           patches/arc4random_stir.patch \
+           patches/configure.patch \
+           patches/local_glob.patch

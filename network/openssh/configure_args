@@ -1,0 +1,5 @@
+--host=x86_64-pc-freebsd
+--disable-utmpx
+--sbindir=/bin
+--with-openssl
+--with-zlib
