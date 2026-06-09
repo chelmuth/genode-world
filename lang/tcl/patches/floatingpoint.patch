@@ -1,0 +1,24 @@
+floatingpoint.patch
+
+diff --git a/unix/tclUnixInit.c b/unix/tclUnixInit.c
+index 6460c90..3c617dc 100644
+--- a/unix/tclUnixInit.c
++++ b/unix/tclUnixInit.c
+@@ -22,7 +22,7 @@
+ #    endif
+ #endif
+ #include <sys/resource.h>
+-#if defined(__FreeBSD__) && defined(__GNUC__)
++#if defined(__FreeBSD__) && defined(__GNUC__) && 0
+ #   include <floatingpoint.h>
+ #endif
+ #if defined(__bsdi__)
+@@ -390,7 +390,7 @@ TclpInitPlatform(void)
+     (void) signal(SIGPIPE, SIG_IGN);
+ #endif /* SIGPIPE */
+ 
+-#if defined(__FreeBSD__) && defined(__GNUC__)
++#if defined(__FreeBSD__) && defined(__GNUC__) && 0
+     /*
+      * Adjust the rounding mode to be more conventional. Note that FreeBSD
+      * only provides the __fpsetreg() used by the following two for the GNU

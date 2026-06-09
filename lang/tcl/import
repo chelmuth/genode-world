@@ -1,0 +1,14 @@
+LICENSE   := BSD
+VERSION   := 8.6.18
+DOWNLOADS := tcl.archive
+
+URL(tcl) := https://prdownloads.sourceforge.net/tcl/tcl$(VERSION)-src.tar.gz
+SHA(tcl) := 14f9af32b1767ff718477a8f974ad03c34341097e6b43f4ce54644ee974e268e
+DIR(tcl) := src
+
+PATCHES   := patches/genode.patch \
+             patches/chmod.patch \
+             patches/configure_wrapper.patch \
+             patches/floatingpoint.patch \
+             patches/main.patch
+PATCH_OPT := -p1 -d src

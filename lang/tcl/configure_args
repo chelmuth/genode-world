@@ -1,0 +1,5 @@
+--disable-rpath
+--disable-threads
+tcl_cv_sys_version=FreeBSD-12.0-RELEASE
+ac_cv_func_strtod=yes
+tcl_cv_strtod_buggy=1

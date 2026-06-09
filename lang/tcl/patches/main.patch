@@ -1,0 +1,19 @@
+main.patch
+
+By default, tclsh is generated with a hidden 'main' symbol, which cannot
+be found by Genode's dynamic linker. Since this behavior is not
+configurable, we need to patch the declaration.
+
+diff --git a/unix/tclAppInit.c b/unix/tclAppInit.c
+index 5043e9f..302e3d2 100644
+--- a/unix/tclAppInit.c
++++ b/unix/tclAppInit.c
+@@ -43,7 +43,7 @@ extern Tcl_LibraryInitProc Tclxttest_Init;
+ #   define MODULE_SCOPE extern
+ #endif
+ MODULE_SCOPE int TCL_LOCAL_APPINIT(Tcl_Interp *);
+-MODULE_SCOPE int main(int, char **);
++int main(int, char **);
+ 
+ /*
+  * The following #if block allows you to change how Tcl finds the startup

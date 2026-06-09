@@ -1,0 +1,59 @@
+genode.patch
+
+diff --git a/unix/Makefile.in b/unix/Makefile.in
+index 23f86c8..e5e3009 100644
+--- a/unix/Makefile.in
++++ b/unix/Makefile.in
+@@ -231,7 +231,7 @@ COMPAT_DIR		= $(TOP_DIR)/compat
+ TOOL_DIR		= $(TOP_DIR)/tools
+ UNIX_DIR		= $(TOP_DIR)/unix
+ MAC_OSX_DIR		= $(TOP_DIR)/macosx
+-PKGS_DIR		= $(TOP_DIR)/pkgs
++#PKGS_DIR		= $(TOP_DIR)/pkgs
+ # Must be absolute because of the cd dltest $(DLTEST_DIR)/configure below.
+ DLTEST_DIR		= @TCL_SRC_DIR@/unix/dltest
+ # Must be absolute to so the corresponding tcltest's tcl_library is absolute.
+diff --git a/unix/configure b/unix/configure
+index a4ddcb2..dc56aa2 100755
+--- a/unix/configure
++++ b/unix/configure
+@@ -7305,7 +7305,7 @@ fi
+ 	    ;;
+ 	Linux*|GNU*|NetBSD-Debian|DragonFly-*|FreeBSD-*)
+ 	    SHLIB_CFLAGS="-fPIC -fno-common"
+-	    SHLIB_SUFFIX=".so"
++	    SHLIB_SUFFIX=".lib.so"
+ 
+ 	    CFLAGS_OPTIMIZE="-O2"
+ 	    # egcs-2.91.66 on Redhat Linux 6.0 generates lots of warnings
+@@ -7315,7 +7315,7 @@ fi
+ 
+ 	    SHLIB_LD='${CC} ${CFLAGS} ${LDFLAGS} -shared'
+ 	    DL_OBJS="tclLoadDl.o"
+-	    DL_LIBS="-ldl"
++	    DL_LIBS=""
+ 	    LDFLAGS="$LDFLAGS -Wl,--export-dynamic"
+ 
+ 	    case $system in
+diff --git a/unix/tcl.m4 b/unix/tcl.m4
+index cd89170..fb602a6 100644
+--- a/unix/tcl.m4
++++ b/unix/tcl.m4
+@@ -1370,7 +1370,7 @@ AC_DEFUN([SC_CONFIG_CFLAGS], [
+ 	    ;;
+ 	Linux*|GNU*|NetBSD-Debian|DragonFly-*|FreeBSD-*)
+ 	    SHLIB_CFLAGS="-fPIC -fno-common"
+-	    SHLIB_SUFFIX=".so"
++	    SHLIB_SUFFIX=".lib.so"
+ 
+ 	    CFLAGS_OPTIMIZE="-O2"
+ 	    # egcs-2.91.66 on Redhat Linux 6.0 generates lots of warnings
+@@ -1380,7 +1380,7 @@ AC_DEFUN([SC_CONFIG_CFLAGS], [
+ 
+ 	    SHLIB_LD='${CC} ${CFLAGS} ${LDFLAGS} -shared'
+ 	    DL_OBJS="tclLoadDl.o"
+-	    DL_LIBS="-ldl"
++	    DL_LIBS=""
+ 	    LDFLAGS="$LDFLAGS -Wl,--export-dynamic"
+ 
+ 	    case $system in

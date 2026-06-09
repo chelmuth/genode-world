@@ -1,0 +1,2 @@
+install/lib/libtcl8.6.lib.so
+tcl.tar: install/
