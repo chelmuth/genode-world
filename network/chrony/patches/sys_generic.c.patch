@@ -1,5 +1,5 @@
---- src/chronyd/sys_generic.c.orig	2025-03-12 15:07:49.534708120 +0100
-+++ src/chronyd/sys_generic.c	2025-03-12 15:08:12.944528241 +0100
+--- src/chronyd/sys_generic.c.orig	2026-06-09 18:25:38.000000000 +0200
++++ src/chronyd/sys_generic.c	2026-06-09 18:26:40.994407939 +0200
 @@ -80,9 +80,6 @@ static struct timespec slew_start;
  /* Scheduler timeout ID for ending of the currently running slew */
  static SCH_TimeoutID slew_timeout_id;
@@ -171,7 +171,7 @@
  }
  
  /* ================================================== */
-@@ -430,20 +441,6 @@ SYS_Generic_CompleteFreqDriver(double ma
+@@ -430,19 +441,6 @@ SYS_Generic_CompleteFreqDriver(double ma
  void
  SYS_Generic_Finalise(void)
  {
@@ -188,7 +188,6 @@
 -  LCL_ReadRawTime(&now);
 -  stop_fastslew(&now);
 -
--  LCL_RemoveParameterChangeHandler(handle_step, NULL);
+   LCL_RemoveParameterChangeHandler(handle_step, NULL);
  }
  
- /* ================================================== */
