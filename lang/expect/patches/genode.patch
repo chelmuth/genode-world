@@ -1,0 +1,802 @@
+genode.patch
+
+diff --git a/Makefile.in b/Makefile.in
+index 2d36791..804e96e 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -394,6 +394,7 @@ expect:	exp_main_exp.o $(PKG_LIB_FILE)
+ 		-o expect exp_main_exp.o \
+ 		@EXP_BUILD_LIB_SPEC@ \
+ 		@TCL_LIB_SPEC@ \
++		@TCL_LIBS@ \
+ 		@TCL_DL_LIBS@ @PKG_LIBS@ @MATH_LIBS@ \
+ 		@TCL_CC_SEARCH_FLAGS@ \
+ 		@EXP_CC_SEARCH_FLAGS@
+diff --git a/configure b/configure
+index 8fc3396..ee7472c 100755
+--- a/configure
++++ b/configure
+@@ -667,7 +667,6 @@ CELIB_DIR
+ AR
+ SHARED_BUILD
+ TCL_THREADS
+-TCL_TOP_DIR_NATIVE
+ TCL_INCLUDES
+ MATH_LIBS
+ EGREP
+@@ -730,7 +729,6 @@ infodir
+ docdir
+ oldincludedir
+ includedir
+-runstatedir
+ localstatedir
+ sharedstatedir
+ sysconfdir
+@@ -753,7 +751,6 @@ SHELL'
+ ac_subst_files=''
+ ac_user_opts='
+ enable_option_checking
+-with_tcl
+ with_tclinclude
+ enable_threads
+ enable_shared
+@@ -811,7 +808,6 @@ datadir='${datarootdir}'
+ sysconfdir='${prefix}/etc'
+ sharedstatedir='${prefix}/com'
+ localstatedir='${prefix}/var'
+-runstatedir='${localstatedir}/run'
+ includedir='${prefix}/include'
+ oldincludedir='/usr/include'
+ docdir='${datarootdir}/doc/${PACKAGE_TARNAME}'
+@@ -1064,15 +1060,6 @@ do
+   | -silent | --silent | --silen | --sile | --sil)
+     silent=yes ;;
+ 
+-  -runstatedir | --runstatedir | --runstatedi | --runstated \
+-  | --runstate | --runstat | --runsta | --runst | --runs \
+-  | --run | --ru | --r)
+-    ac_prev=runstatedir ;;
+-  -runstatedir=* | --runstatedir=* | --runstatedi=* | --runstated=* \
+-  | --runstate=* | --runstat=* | --runsta=* | --runst=* | --runs=* \
+-  | --run=* | --ru=* | --r=*)
+-    runstatedir=$ac_optarg ;;
+-
+   -sbindir | --sbindir | --sbindi | --sbind | --sbin | --sbi | --sb)
+     ac_prev=sbindir ;;
+   -sbindir=* | --sbindir=* | --sbindi=* | --sbind=* | --sbin=* \
+@@ -1210,7 +1197,7 @@ fi
+ for ac_var in	exec_prefix prefix bindir sbindir libexecdir datarootdir \
+ 		datadir sysconfdir sharedstatedir localstatedir includedir \
+ 		oldincludedir docdir infodir htmldir dvidir pdfdir psdir \
+-		libdir localedir mandir runstatedir
++		libdir localedir mandir
+ do
+   eval ac_val=\$$ac_var
+   # Remove trailing slashes.
+@@ -1363,7 +1350,6 @@ Fine tuning of the installation directories:
+   --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
+   --sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]
+   --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
+-  --runstatedir=DIR       modifiable per-process data [LOCALSTATEDIR/run]
+   --libdir=DIR            object code libraries [EPREFIX/lib]
+   --includedir=DIR        C header files [PREFIX/include]
+   --oldincludedir=DIR     C header files for non-gcc [/usr/include]
+@@ -1409,8 +1395,6 @@ Optional Features:
+ Optional Packages:
+   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
+   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+-  --with-tcl              directory containing tcl configuration
+-                          (tclConfig.sh)
+   --with-tclinclude       directory containing the public Tcl header files
+   --with-celib=DIR        use Windows/CE support library from DIR
+ 
+@@ -2507,151 +2491,7 @@ ac_configure="$SHELL $ac_aux_dir/configure"  # Please don't use this var.
+ # Load the tclConfig.sh file
+ #--------------------------------------------------------------------
+ 
+-
+-
+-    #
+-    # Ok, lets find the tcl configuration
+-    # First, look for one uninstalled.
+-    # the alternative search directory is invoked by --with-tcl
+-    #
+-
+-    if test x"${no_tcl}" = x ; then
+-	# we reset no_tcl in case something fails here
+-	no_tcl=true
+-
+-# Check whether --with-tcl was given.
+-if test "${with_tcl+set}" = set; then :
+-  withval=$with_tcl; with_tclconfig="${withval}"
+-fi
+-
+-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for Tcl configuration" >&5
+-$as_echo_n "checking for Tcl configuration... " >&6; }
+-	if ${ac_cv_c_tclconfig+:} false; then :
+-  $as_echo_n "(cached) " >&6
+-else
+-
+-
+-	    # First check to see if --with-tcl was specified.
+-	    if test x"${with_tclconfig}" != x ; then
+-		case "${with_tclconfig}" in
+-		    */tclConfig.sh )
+-			if test -f "${with_tclconfig}"; then
+-			    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: --with-tcl argument should refer to directory containing tclConfig.sh, not to tclConfig.sh itself" >&5
+-$as_echo "$as_me: WARNING: --with-tcl argument should refer to directory containing tclConfig.sh, not to tclConfig.sh itself" >&2;}
+-			    with_tclconfig="`echo "${with_tclconfig}" | sed 's!/tclConfig\.sh$!!'`"
+-			fi ;;
+-		esac
+-		if test -f "${with_tclconfig}/tclConfig.sh" ; then
+-		    ac_cv_c_tclconfig="`(cd "${with_tclconfig}"; pwd)`"
+-		else
+-		    as_fn_error $? "${with_tclconfig} directory doesn't contain tclConfig.sh" "$LINENO" 5
+-		fi
+-	    fi
+-
+-	    # then check for a private Tcl installation
+-	    if test x"${ac_cv_c_tclconfig}" = x ; then
+-		for i in \
+-			../tcl \
+-			`ls -dr ../tcl[8-9].[0-9].[0-9]* 2>/dev/null` \
+-			`ls -dr ../tcl[8-9].[0-9] 2>/dev/null` \
+-			`ls -dr ../tcl[8-9].[0-9]* 2>/dev/null` \
+-			../../tcl \
+-			`ls -dr ../../tcl[8-9].[0-9].[0-9]* 2>/dev/null` \
+-			`ls -dr ../../tcl[8-9].[0-9] 2>/dev/null` \
+-			`ls -dr ../../tcl[8-9].[0-9]* 2>/dev/null` \
+-			../../../tcl \
+-			`ls -dr ../../../tcl[8-9].[0-9].[0-9]* 2>/dev/null` \
+-			`ls -dr ../../../tcl[8-9].[0-9] 2>/dev/null` \
+-			`ls -dr ../../../tcl[8-9].[0-9]* 2>/dev/null` ; do
+-		    if test "${TEA_PLATFORM}" = "windows" \
+-			    -a -f "$i/win/tclConfig.sh" ; then
+-			ac_cv_c_tclconfig="`(cd $i/win; pwd)`"
+-			break
+-		    fi
+-		    if test -f "$i/unix/tclConfig.sh" ; then
+-			ac_cv_c_tclconfig="`(cd $i/unix; pwd)`"
+-			break
+-		    fi
+-		done
+-	    fi
+-
+-	    # on Darwin, check in Framework installation locations
+-	    if test "`uname -s`" = "Darwin" -a x"${ac_cv_c_tclconfig}" = x ; then
+-		for i in `ls -d ~/Library/Frameworks 2>/dev/null` \
+-			`ls -d /Library/Frameworks 2>/dev/null` \
+-			`ls -d /Network/Library/Frameworks 2>/dev/null` \
+-			`ls -d /System/Library/Frameworks 2>/dev/null` \
+-			; do
+-		    if test -f "$i/Tcl.framework/tclConfig.sh" ; then
+-			ac_cv_c_tclconfig="`(cd $i/Tcl.framework; pwd)`"
+-			break
+-		    fi
+-		done
+-	    fi
+-
+-	    # TEA specific: on Windows, check in common installation locations
+-	    if test "${TEA_PLATFORM}" = "windows" \
+-		-a x"${ac_cv_c_tclconfig}" = x ; then
+-		for i in `ls -d C:/Tcl/lib 2>/dev/null` \
+-			`ls -d C:/Progra~1/Tcl/lib 2>/dev/null` \
+-			; do
+-		    if test -f "$i/tclConfig.sh" ; then
+-			ac_cv_c_tclconfig="`(cd $i; pwd)`"
+-			break
+-		    fi
+-		done
+-	    fi
+-
+-	    # check in a few common install locations
+-	    if test x"${ac_cv_c_tclconfig}" = x ; then
+-		for i in `ls -d ${libdir} 2>/dev/null` \
+-			`ls -d ${exec_prefix}/lib 2>/dev/null` \
+-			`ls -d ${prefix}/lib 2>/dev/null` \
+-			`ls -d /usr/local/lib 2>/dev/null` \
+-			`ls -d /usr/contrib/lib 2>/dev/null` \
+-			`ls -d /usr/lib 2>/dev/null` \
+-			`ls -d /usr/lib64 2>/dev/null` \
+-			; do
+-		    if test -f "$i/tclConfig.sh" ; then
+-			ac_cv_c_tclconfig="`(cd $i; pwd)`"
+-			break
+-		    fi
+-		done
+-	    fi
+-
+-	    # check in a few other private locations
+-	    if test x"${ac_cv_c_tclconfig}" = x ; then
+-		for i in \
+-			${srcdir}/../tcl \
+-			`ls -dr ${srcdir}/../tcl[8-9].[0-9].[0-9]* 2>/dev/null` \
+-			`ls -dr ${srcdir}/../tcl[8-9].[0-9] 2>/dev/null` \
+-			`ls -dr ${srcdir}/../tcl[8-9].[0-9]* 2>/dev/null` ; do
+-		    if test "${TEA_PLATFORM}" = "windows" \
+-			    -a -f "$i/win/tclConfig.sh" ; then
+-			ac_cv_c_tclconfig="`(cd $i/win; pwd)`"
+-			break
+-		    fi
+-		    if test -f "$i/unix/tclConfig.sh" ; then
+-			ac_cv_c_tclconfig="`(cd $i/unix; pwd)`"
+-			break
+-		    fi
+-		done
+-	    fi
+-
+-fi
+-
+-
+-	if test x"${ac_cv_c_tclconfig}" = x ; then
+-	    TCL_BIN_DIR="# no Tcl configs found"
+-	    as_fn_error $? "Can't find Tcl configuration definitions" "$LINENO" 5
+-	else
+-	    no_tcl=
+-	    TCL_BIN_DIR="${ac_cv_c_tclconfig}"
+-	    { $as_echo "$as_me:${as_lineno-$LINENO}: result: found ${TCL_BIN_DIR}/tclConfig.sh" >&5
+-$as_echo "found ${TCL_BIN_DIR}/tclConfig.sh" >&6; }
+-	fi
+-    fi
+-
++#TEA_PATH_TCLCONFIG
+ 
+     { $as_echo "$as_me:${as_lineno-$LINENO}: checking for existence of ${TCL_BIN_DIR}/tclConfig.sh" >&5
+ $as_echo_n "checking for existence of ${TCL_BIN_DIR}/tclConfig.sh... " >&6; }
+@@ -5002,7 +4842,6 @@ done
+ # This MUST be called after TEA_LOAD_TCLCONFIG / TEA_LOAD_TKCONFIG
+ #--------------------------------------------------------------------
+ 
+-#TEA_PUBLIC_TCL_HEADERS
+ 
+     { $as_echo "$as_me:${as_lineno-$LINENO}: checking for Tcl public headers" >&5
+ $as_echo_n "checking for Tcl public headers... " >&6; }
+@@ -5087,67 +4926,7 @@ $as_echo "${ac_cv_c_tclh}" >&6; }
+ 
+ 
+ 
+-
+-    # Allow for --with-tclinclude to take effect and define ${ac_cv_c_tclh}
+-
+-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for Tcl private include files" >&5
+-$as_echo_n "checking for Tcl private include files... " >&6; }
+-
+-    TCL_SRC_DIR_NATIVE=`${CYGPATH} ${TCL_SRC_DIR}`
+-    TCL_TOP_DIR_NATIVE=\"${TCL_SRC_DIR_NATIVE}\"
+-
+-    # Check to see if tcl<Plat>Port.h isn't already with the public headers
+-    # Don't look for tclInt.h because that resides with tcl.h in the core
+-    # sources, but the <plat>Port headers are in a different directory
+-    if test "${TEA_PLATFORM}" = "windows" -a \
+-	-f "${ac_cv_c_tclh}/tclWinPort.h"; then
+-	result="private headers found with public headers"
+-    elif test "${TEA_PLATFORM}" = "unix" -a \
+-	-f "${ac_cv_c_tclh}/tclUnixPort.h"; then
+-	result="private headers found with public headers"
+-    else
+-	TCL_GENERIC_DIR_NATIVE=\"${TCL_SRC_DIR_NATIVE}/generic\"
+-	if test "${TEA_PLATFORM}" = "windows"; then
+-	    TCL_PLATFORM_DIR_NATIVE=\"${TCL_SRC_DIR_NATIVE}/win\"
+-	else
+-	    TCL_PLATFORM_DIR_NATIVE=\"${TCL_SRC_DIR_NATIVE}/unix\"
+-	fi
+-	# Overwrite the previous TCL_INCLUDES as this should capture both
+-	# public and private headers in the same set.
+-	# We want to ensure these are substituted so as not to require
+-	# any *_NATIVE vars be defined in the Makefile
+-	TCL_INCLUDES="-I${TCL_GENERIC_DIR_NATIVE} -I${TCL_PLATFORM_DIR_NATIVE}"
+-	if test "`uname -s`" = "Darwin"; then
+-            # If Tcl was built as a framework, attempt to use
+-            # the framework's Headers and PrivateHeaders directories
+-            case ${TCL_DEFS} in
+-	    	*TCL_FRAMEWORK*)
+-		    if test -d "${TCL_BIN_DIR}/Headers"; then
+-			if test -d "${TCL_BIN_DIR}/PrivateHeaders"; then
+-			    TCL_INCLUDES="-I\"${TCL_BIN_DIR}/Headers\" -I\"${TCL_BIN_DIR}/PrivateHeaders\" ${TCL_INCLUDES}"
+-			elif test -d "${TCL_BIN_DIR}/Headers/tcl-private"; then
+-			    TCL_INCLUDES="-I\"${TCL_BIN_DIR}/Headers\" -I\"${TCL_BIN_DIR}/Headers/tcl-private\" ${TCL_INCLUDES}"
+-			fi
+-		    else
+-			TCL_INCLUDES="${TCL_INCLUDES} ${TCL_INCLUDE_SPEC} `echo "${TCL_INCLUDE_SPEC}" | sed -e 's/Headers/PrivateHeaders/'`"
+-		    fi
+-	            ;;
+-	    esac
+-	    result="Using ${TCL_INCLUDES}"
+-	else
+-	    if test ! -f "${TCL_SRC_DIR}/generic/tclInt.h" ; then
+-		as_fn_error $? "Cannot find private header tclInt.h in ${TCL_SRC_DIR}" "$LINENO" 5
+-	    fi
+-	    result="Using srcdir found in tclConfig.sh: ${TCL_SRC_DIR}"
+-	fi
+-    fi
+-
+-
+-
+-
+-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: ${result}" >&5
+-$as_echo "${result}" >&6; }
+-
++#TEA_PRIVATE_TCL_HEADERS
+ 
+ #--------------------------------------------------------------------
+ # You can add more files to clean if your extension creates any extra
+@@ -6566,10 +6345,10 @@ fi
+ 	FreeBSD-*)
+ 	    # This configuration from FreeBSD Ports.
+ 	    SHLIB_CFLAGS="-fPIC"
+-	    SHLIB_LD="${CC} -shared"
++	    SHLIB_LD="${CC} -shared $LDFLAGS"
+ 	    TCL_SHLIB_LD_EXTRAS="-soname \$@"
+-	    SHLIB_SUFFIX=".so"
+-	    LDFLAGS=""
++	    SHLIB_SUFFIX=".lib.so"
++	    LDFLAGS="$LDFLAGS"
+ 	    if test $doRpath = yes; then :
+ 
+ 		CC_SEARCH_FLAGS='-Wl,-rpath,${LIB_RUNTIME_DIR}'
+@@ -6583,9 +6362,9 @@ fi
+ 		LDFLAGS="$LDFLAGS $PTHREAD_LIBS"
+ fi
+ 	    # Version numbers are dot-stripped by system policy.
+-	    TCL_TRIM_DOTS=`echo ${VERSION} | tr -d .`
++	    TCL_TRIM_DOTS=`echo ${PACKAGE_VERSION} | tr -d .`
+ 	    UNSHARED_LIB_SUFFIX='${TCL_TRIM_DOTS}.a'
+-	    SHARED_LIB_SUFFIX='${TCL_TRIM_DOTS}\$\{DBGX\}.so.1'
++	    SHARED_LIB_SUFFIX='${TCL_TRIM_DOTS}\$\{DBGX\}${SHLIB_SUFFIX}'
+ 	    TCL_LIB_VERSIONS_OK=nodots
+ 	    ;;
+ 	Darwin-*)
+@@ -7598,11 +7377,8 @@ $as_echo "enabled $tcl_ok debugging" >&6; }
+ # link against the non-stubbed Tcl library.
+ #--------------------------------------------------------------------
+ 
+-$as_echo "#define USE_TCL_STUBS 1" >>confdefs.h
+-
+-
+-$as_echo "#define USE_TCL_STUBS 1" >>confdefs.h
+-
++#AC_DEFINE(USE_TCL_STUBS)
++#AC_DEFINE(USE_TCL_STUBS, 1, [Use Tcl stubs])
+ 
+ #-------------------------------------------------------------------------
+ # Check for system header files.
+@@ -8824,7 +8600,8 @@ rm -f core conftest.err conftest.$ac_objext \
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking if WNOHANG requires _POSIX_SOURCE" >&5
+ $as_echo_n "checking if WNOHANG requires _POSIX_SOURCE... " >&6; }
+ if test "$cross_compiling" = yes; then :
+-  as_fn_error $? "Expect can't be cross compiled" "$LINENO" 5
++  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
++$as_echo "no" >&6; }
+ 
+ else
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+@@ -8859,7 +8636,13 @@ fi
+ $as_echo_n "checking if any value exists for WNOHANG... " >&6; }
+ rm -rf wnohang
+ if test "$cross_compiling" = yes; then :
+-  as_fn_error $? "Expect can't be cross compiled" "$LINENO" 5
++  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
++$as_echo "yes" >&6; }
++	cat >>confdefs.h <<_ACEOF
++#define WNOHANG_BACKUP_VALUE `cat wnohang`
++_ACEOF
++
++	rm -f wnohang
+ 
+ else
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+@@ -8927,8 +8710,8 @@ fi
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking if signals need to be re-armed" >&5
+ $as_echo_n "checking if signals need to be re-armed... " >&6; }
+ if test "$cross_compiling" = yes; then :
+-  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Expect can't be cross compiled" >&5
+-$as_echo "$as_me: WARNING: Expect can't be cross compiled" >&2;}
++  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
++$as_echo "no" >&6; }
+ 
+ else
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+@@ -9227,7 +9010,11 @@ fi
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking for struct sgttyb" >&5
+ $as_echo_n "checking for struct sgttyb... " >&6; }
+ if test "$cross_compiling" = yes; then :
+-  as_fn_error $? "Expect can't be cross compiled" "$LINENO" 5
++  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
++$as_echo "yes" >&6; }
++        $as_echo "#define HAVE_SGTTYB 1" >>confdefs.h
++
++        PTY_TYPE=sgttyb
+ 
+ else
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+@@ -9268,7 +9055,11 @@ if test $mach -eq 0 ; then
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for struct termio" >&5
+ $as_echo_n "checking for struct termio... " >&6; }
+   if test "$cross_compiling" = yes; then :
+-  as_fn_error $? "Expect can't be cross compiled" "$LINENO" 5
++  $as_echo "#define HAVE_TERMIO 1" >>confdefs.h
++
++        PTY_TYPE=termios
++        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
++$as_echo "yes" >&6; }
+ 
+ else
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+@@ -9301,7 +9092,11 @@ fi
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for struct termios" >&5
+ $as_echo_n "checking for struct termios... " >&6; }
+   if test "$cross_compiling" = yes; then :
+-  as_fn_error $? "Expect can't be cross compiled" "$LINENO" 5
++  $as_echo "#define HAVE_TERMIOS 1" >>confdefs.h
++
++        PTY_TYPE=termios
++        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
++$as_echo "yes" >&6; }
+ 
+ else
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+@@ -9339,7 +9134,8 @@ fi
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking if TCGETS or TCGETA in termios.h" >&5
+ $as_echo_n "checking if TCGETS or TCGETA in termios.h... " >&6; }
+ if test "$cross_compiling" = yes; then :
+-  as_fn_error $? "Expect can't be cross compiled" "$LINENO" 5
++  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
++$as_echo "no" >&6; }
+ 
+ else
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+@@ -9377,7 +9173,8 @@ fi
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking if TIOCGWINSZ in termios.h" >&5
+ $as_echo_n "checking if TIOCGWINSZ in termios.h... " >&6; }
+ if test "$cross_compiling" = yes; then :
+-  as_fn_error $? "Expect can't be cross compiled" "$LINENO" 5
++  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
++$as_echo "no" >&6; }
+ 
+ else
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+@@ -9417,7 +9214,8 @@ fi
+ $as_echo_n "checking for Cray-style ptys... " >&6; }
+ SETUID=":"
+ if test "$cross_compiling" = yes; then :
+-  as_fn_error $? "Expect can't be cross compiled" "$LINENO" 5
++  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
++$as_echo "no" >&6; }
+ 
+ else
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+@@ -9557,8 +9355,10 @@ fi
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking for SV-style timezone" >&5
+ $as_echo_n "checking for SV-style timezone... " >&6; }
+ if test "$cross_compiling" = yes; then :
+-  as_fn_error $? "Expect can't be cross compiled" "$LINENO" 5
++  $as_echo "#define HAVE_SV_TIMEZONE 1" >>confdefs.h
+ 
++	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
++$as_echo "yes" >&6; }
+ else
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */
+@@ -9988,7 +9788,7 @@ rm -f conftest*
+     else
+ 	RANLIB_STUB="${RANLIB}"
+ 	if test "${SHARED_BUILD}" = "1" ; then
+-	    SHLIB_LD_LIBS="${SHLIB_LD_LIBS} ${TCL_STUB_LIB_SPEC}"
++	    SHLIB_LD_LIBS="${SHLIB_LD_LIBS}"
+ 	    if test x"${TK_BIN_DIR}" != x ; then
+ 		SHLIB_LD_LIBS="${SHLIB_LD_LIBS} ${TK_STUB_LIB_SPEC}"
+ 	    fi
+diff --git a/configure.in b/configure.in
+index a1425b2..40615e0 100755
+--- a/configure.in
++++ b/configure.in
+@@ -18,7 +18,7 @@ AC_CONFIG_AUX_DIR(tclconfig)
+ # Load the tclConfig.sh file
+ #--------------------------------------------------------------------
+ 
+-TEA_PATH_TCLCONFIG
++#TEA_PATH_TCLCONFIG
+ TEA_LOAD_TCLCONFIG
+ 
+ # expectk has been removed from the distribution as Tcl has supported
+@@ -54,8 +54,8 @@ TEA_SETUP_COMPILER
+ # This MUST be called after TEA_LOAD_TCLCONFIG / TEA_LOAD_TKCONFIG
+ #--------------------------------------------------------------------
+ 
+-#TEA_PUBLIC_TCL_HEADERS
+-TEA_PRIVATE_TCL_HEADERS
++TEA_PUBLIC_TCL_HEADERS
++#TEA_PRIVATE_TCL_HEADERS
+ 
+ #--------------------------------------------------------------------
+ # You can add more files to clean if your extension creates any extra
+@@ -107,8 +107,8 @@ TEA_ENABLE_SYMBOLS
+ # link against the non-stubbed Tcl library.
+ #--------------------------------------------------------------------
+ 
+-AC_DEFINE(USE_TCL_STUBS)
+-AC_DEFINE(USE_TCL_STUBS, 1, [Use Tcl stubs])
++#AC_DEFINE(USE_TCL_STUBS)
++#AC_DEFINE(USE_TCL_STUBS, 1, [Use Tcl stubs])
+ 
+ #-------------------------------------------------------------------------
+ # Check for system header files.
+diff --git a/tclconfig/config.sub b/tclconfig/config.sub
+index 79657cd..2b2dea0 100755
+--- a/tclconfig/config.sub
++++ b/tclconfig/config.sub
+@@ -292,6 +292,7 @@ case $basic_machine in
+ 	# Recognize the basic CPU types with company name.
+ 	580-* \
+ 	| a29k-* \
++	| aarch64-* \
+ 	| alpha-* | alphaev[4-8]-* | alphaev56-* | alphaev6[78]-* \
+ 	| alpha64-* | alpha64ev[4-8]-* | alpha64ev56-* | alpha64ev6[78]-* \
+ 	| alphapca5[67]-* | alpha64pca5[67]-* | arc-* \
+diff --git a/tclconfig/tcl.m4 b/tclconfig/tcl.m4
+index 614c986..e6b0dc0 100644
+--- a/tclconfig/tcl.m4
++++ b/tclconfig/tcl.m4
+@@ -1631,10 +1631,10 @@ dnl AC_CHECK_TOOL(AR, ar)
+ 	FreeBSD-*)
+ 	    # This configuration from FreeBSD Ports.
+ 	    SHLIB_CFLAGS="-fPIC"
+-	    SHLIB_LD="${CC} -shared"
++	    SHLIB_LD="${CC} -shared $LDFLAGS"
+ 	    TCL_SHLIB_LD_EXTRAS="-soname \$[@]"
+-	    SHLIB_SUFFIX=".so"
+-	    LDFLAGS=""
++	    SHLIB_SUFFIX=".lib.so"
++	    LDFLAGS="$LDFLAGS"
+ 	    AS_IF([test $doRpath = yes], [
+ 		CC_SEARCH_FLAGS='-Wl,-rpath,${LIB_RUNTIME_DIR}'
+ 		LD_SEARCH_FLAGS='-rpath ${LIB_RUNTIME_DIR}'])
+@@ -3235,7 +3235,7 @@ print("manifest needed")
+     else
+ 	RANLIB_STUB="${RANLIB}"
+ 	if test "${SHARED_BUILD}" = "1" ; then
+-	    SHLIB_LD_LIBS="${SHLIB_LD_LIBS} ${TCL_STUB_LIB_SPEC}"
++	    SHLIB_LD_LIBS="${SHLIB_LD_LIBS}"
+ 	    if test x"${TK_BIN_DIR}" != x ; then
+ 		SHLIB_LD_LIBS="${SHLIB_LD_LIBS} ${TK_STUB_LIB_SPEC}"
+ 	    fi
+diff --git a/testsuite/configure b/testsuite/configure
+index 8120d11..c198eb0 100755
+--- a/testsuite/configure
++++ b/testsuite/configure
+@@ -682,7 +682,6 @@ infodir
+ docdir
+ oldincludedir
+ includedir
+-runstatedir
+ localstatedir
+ sharedstatedir
+ sysconfdir
+@@ -705,7 +704,6 @@ SHELL'
+ ac_subst_files=''
+ ac_user_opts='
+ enable_option_checking
+-with_tcl
+ '
+       ac_precious_vars='build_alias
+ host_alias
+@@ -754,7 +752,6 @@ datadir='${datarootdir}'
+ sysconfdir='${prefix}/etc'
+ sharedstatedir='${prefix}/com'
+ localstatedir='${prefix}/var'
+-runstatedir='${localstatedir}/run'
+ includedir='${prefix}/include'
+ oldincludedir='/usr/include'
+ docdir='${datarootdir}/doc/${PACKAGE_TARNAME}'
+@@ -1007,15 +1004,6 @@ do
+   | -silent | --silent | --silen | --sile | --sil)
+     silent=yes ;;
+ 
+-  -runstatedir | --runstatedir | --runstatedi | --runstated \
+-  | --runstate | --runstat | --runsta | --runst | --runs \
+-  | --run | --ru | --r)
+-    ac_prev=runstatedir ;;
+-  -runstatedir=* | --runstatedir=* | --runstatedi=* | --runstated=* \
+-  | --runstate=* | --runstat=* | --runsta=* | --runst=* | --runs=* \
+-  | --run=* | --ru=* | --r=*)
+-    runstatedir=$ac_optarg ;;
+-
+   -sbindir | --sbindir | --sbindi | --sbind | --sbin | --sbi | --sb)
+     ac_prev=sbindir ;;
+   -sbindir=* | --sbindir=* | --sbindi=* | --sbind=* | --sbin=* \
+@@ -1153,7 +1141,7 @@ fi
+ for ac_var in	exec_prefix prefix bindir sbindir libexecdir datarootdir \
+ 		datadir sysconfdir sharedstatedir localstatedir includedir \
+ 		oldincludedir docdir infodir htmldir dvidir pdfdir psdir \
+-		libdir localedir mandir runstatedir
++		libdir localedir mandir
+ do
+   eval ac_val=\$$ac_var
+   # Remove trailing slashes.
+@@ -1306,7 +1294,6 @@ Fine tuning of the installation directories:
+   --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
+   --sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]
+   --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
+-  --runstatedir=DIR       modifiable per-process data [LOCALSTATEDIR/run]
+   --libdir=DIR            object code libraries [EPREFIX/lib]
+   --includedir=DIR        C header files [PREFIX/include]
+   --oldincludedir=DIR     C header files for non-gcc [/usr/include]
+@@ -1332,12 +1319,6 @@ if test -n "$ac_init_help"; then
+    esac
+   cat <<\_ACEOF
+ 
+-Optional Packages:
+-  --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
+-  --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+-  --with-tcl              directory containing tcl configuration
+-                          (tclConfig.sh)
+-
+ Some influential environment variables:
+   CC          C compiler command
+   CFLAGS      C compiler flags
+@@ -2265,151 +2246,7 @@ ac_configure="$SHELL $ac_aux_dir/configure"  # Please don't use this var.
+ 
+ 
+ 
+-
+-
+-    #
+-    # Ok, lets find the tcl configuration
+-    # First, look for one uninstalled.
+-    # the alternative search directory is invoked by --with-tcl
+-    #
+-
+-    if test x"${no_tcl}" = x ; then
+-	# we reset no_tcl in case something fails here
+-	no_tcl=true
+-
+-# Check whether --with-tcl was given.
+-if test "${with_tcl+set}" = set; then :
+-  withval=$with_tcl; with_tclconfig="${withval}"
+-fi
+-
+-	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for Tcl configuration" >&5
+-$as_echo_n "checking for Tcl configuration... " >&6; }
+-	if ${ac_cv_c_tclconfig+:} false; then :
+-  $as_echo_n "(cached) " >&6
+-else
+-
+-
+-	    # First check to see if --with-tcl was specified.
+-	    if test x"${with_tclconfig}" != x ; then
+-		case "${with_tclconfig}" in
+-		    */tclConfig.sh )
+-			if test -f "${with_tclconfig}"; then
+-			    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: --with-tcl argument should refer to directory containing tclConfig.sh, not to tclConfig.sh itself" >&5
+-$as_echo "$as_me: WARNING: --with-tcl argument should refer to directory containing tclConfig.sh, not to tclConfig.sh itself" >&2;}
+-			    with_tclconfig="`echo "${with_tclconfig}" | sed 's!/tclConfig\.sh$!!'`"
+-			fi ;;
+-		esac
+-		if test -f "${with_tclconfig}/tclConfig.sh" ; then
+-		    ac_cv_c_tclconfig="`(cd "${with_tclconfig}"; pwd)`"
+-		else
+-		    as_fn_error $? "${with_tclconfig} directory doesn't contain tclConfig.sh" "$LINENO" 5
+-		fi
+-	    fi
+-
+-	    # then check for a private Tcl installation
+-	    if test x"${ac_cv_c_tclconfig}" = x ; then
+-		for i in \
+-			../tcl \
+-			`ls -dr ../tcl[8-9].[0-9].[0-9]* 2>/dev/null` \
+-			`ls -dr ../tcl[8-9].[0-9] 2>/dev/null` \
+-			`ls -dr ../tcl[8-9].[0-9]* 2>/dev/null` \
+-			../../tcl \
+-			`ls -dr ../../tcl[8-9].[0-9].[0-9]* 2>/dev/null` \
+-			`ls -dr ../../tcl[8-9].[0-9] 2>/dev/null` \
+-			`ls -dr ../../tcl[8-9].[0-9]* 2>/dev/null` \
+-			../../../tcl \
+-			`ls -dr ../../../tcl[8-9].[0-9].[0-9]* 2>/dev/null` \
+-			`ls -dr ../../../tcl[8-9].[0-9] 2>/dev/null` \
+-			`ls -dr ../../../tcl[8-9].[0-9]* 2>/dev/null` ; do
+-		    if test "${TEA_PLATFORM}" = "windows" \
+-			    -a -f "$i/win/tclConfig.sh" ; then
+-			ac_cv_c_tclconfig="`(cd $i/win; pwd)`"
+-			break
+-		    fi
+-		    if test -f "$i/unix/tclConfig.sh" ; then
+-			ac_cv_c_tclconfig="`(cd $i/unix; pwd)`"
+-			break
+-		    fi
+-		done
+-	    fi
+-
+-	    # on Darwin, check in Framework installation locations
+-	    if test "`uname -s`" = "Darwin" -a x"${ac_cv_c_tclconfig}" = x ; then
+-		for i in `ls -d ~/Library/Frameworks 2>/dev/null` \
+-			`ls -d /Library/Frameworks 2>/dev/null` \
+-			`ls -d /Network/Library/Frameworks 2>/dev/null` \
+-			`ls -d /System/Library/Frameworks 2>/dev/null` \
+-			; do
+-		    if test -f "$i/Tcl.framework/tclConfig.sh" ; then
+-			ac_cv_c_tclconfig="`(cd $i/Tcl.framework; pwd)`"
+-			break
+-		    fi
+-		done
+-	    fi
+-
+-	    # TEA specific: on Windows, check in common installation locations
+-	    if test "${TEA_PLATFORM}" = "windows" \
+-		-a x"${ac_cv_c_tclconfig}" = x ; then
+-		for i in `ls -d C:/Tcl/lib 2>/dev/null` \
+-			`ls -d C:/Progra~1/Tcl/lib 2>/dev/null` \
+-			; do
+-		    if test -f "$i/tclConfig.sh" ; then
+-			ac_cv_c_tclconfig="`(cd $i; pwd)`"
+-			break
+-		    fi
+-		done
+-	    fi
+-
+-	    # check in a few common install locations
+-	    if test x"${ac_cv_c_tclconfig}" = x ; then
+-		for i in `ls -d ${libdir} 2>/dev/null` \
+-			`ls -d ${exec_prefix}/lib 2>/dev/null` \
+-			`ls -d ${prefix}/lib 2>/dev/null` \
+-			`ls -d /usr/local/lib 2>/dev/null` \
+-			`ls -d /usr/contrib/lib 2>/dev/null` \
+-			`ls -d /usr/lib 2>/dev/null` \
+-			`ls -d /usr/lib64 2>/dev/null` \
+-			; do
+-		    if test -f "$i/tclConfig.sh" ; then
+-			ac_cv_c_tclconfig="`(cd $i; pwd)`"
+-			break
+-		    fi
+-		done
+-	    fi
+-
+-	    # check in a few other private locations
+-	    if test x"${ac_cv_c_tclconfig}" = x ; then
+-		for i in \
+-			${srcdir}/../tcl \
+-			`ls -dr ${srcdir}/../tcl[8-9].[0-9].[0-9]* 2>/dev/null` \
+-			`ls -dr ${srcdir}/../tcl[8-9].[0-9] 2>/dev/null` \
+-			`ls -dr ${srcdir}/../tcl[8-9].[0-9]* 2>/dev/null` ; do
+-		    if test "${TEA_PLATFORM}" = "windows" \
+-			    -a -f "$i/win/tclConfig.sh" ; then
+-			ac_cv_c_tclconfig="`(cd $i/win; pwd)`"
+-			break
+-		    fi
+-		    if test -f "$i/unix/tclConfig.sh" ; then
+-			ac_cv_c_tclconfig="`(cd $i/unix; pwd)`"
+-			break
+-		    fi
+-		done
+-	    fi
+-
+-fi
+-
+-
+-	if test x"${ac_cv_c_tclconfig}" = x ; then
+-	    TCL_BIN_DIR="# no Tcl configs found"
+-	    as_fn_error $? "Can't find Tcl configuration definitions" "$LINENO" 5
+-	else
+-	    no_tcl=
+-	    TCL_BIN_DIR="${ac_cv_c_tclconfig}"
+-	    { $as_echo "$as_me:${as_lineno-$LINENO}: result: found ${TCL_BIN_DIR}/tclConfig.sh" >&5
+-$as_echo "found ${TCL_BIN_DIR}/tclConfig.sh" >&6; }
+-	fi
+-    fi
+-
++#TEA_PATH_TCLCONFIG
+ 
+     { $as_echo "$as_me:${as_lineno-$LINENO}: checking for existence of ${TCL_BIN_DIR}/tclConfig.sh" >&5
+ $as_echo_n "checking for existence of ${TCL_BIN_DIR}/tclConfig.sh... " >&6; }
+diff --git a/testsuite/configure.in b/testsuite/configure.in
+index cac7cec..6bc8537 100644
+--- a/testsuite/configure.in
++++ b/testsuite/configure.in
+@@ -5,7 +5,7 @@ TEA_INIT([3.9])
+ 
+ AC_CONFIG_AUX_DIR(../tclconfig)
+ 
+-TEA_PATH_TCLCONFIG
++#TEA_PATH_TCLCONFIG
+ TEA_LOAD_TCLCONFIG
+ 
+ TEA_SETUP_COMPILER

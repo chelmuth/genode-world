@@ -1,0 +1,279 @@
+Dbg_Active T
+Dbg_ArgcArgv T
+Dbg_IgnoreFuncs T
+Dbg_Interactor T
+Dbg_Off T
+Dbg_On T
+Dbg_Output T
+Dbg_StdinMode T
+Dbg_VarName D 8
+Exp_CloseOnEofObjCmd T
+Exp_ExpContinueObjCmd T
+Exp_ExpVersionObjCmd T
+Exp_ExpectGlobalObjCmd T
+Exp_ExpectObjCmd T
+Exp_InterReturnObjCmd T
+Exp_InteractObjCmd T
+Exp_InterpreterObjCmd T
+Exp_MatchMaxObjCmd T
+Exp_OpenObjCmd T
+Exp_ParityObjCmd T
+Exp_Prompt1ObjCmd T
+Exp_Prompt2ObjCmd T
+Exp_RemoveNullsObjCmd T
+Exp_StringCaseMatch T
+Exp_TrapObjCmd T
+Expect_Init T
+TclGetRegError T
+TclRegComp T
+TclRegExec T
+expAdjust T
+expChannelCountGet T
+expChannelInit T
+expChannelStillAlive T
+expChannelType D 136
+expCloseOnExec T
+expCreateChannel T
+expCreateStateToInput T
+expDevttyGet T
+expDevttyIs T
+expDiagChannelClose T
+expDiagChannelGet T
+expDiagChannelOpen T
+expDiagFilename T
+expDiagInit T
+expDiagLog T
+expDiagLogPtr T
+expDiagLogPtrSet T
+expDiagLogPtrStr T
+expDiagLogPtrStrStr T
+expDiagLogPtrX T
+expDiagLogU T
+expDiagToStderrGet T
+expDiagToStderrSet T
+expDiagWriteBytes T
+expDiagWriteChars T
+expDiagWriteObj T
+expErrnoMsg T
+expErrnoMsgSet T
+expErrorLog T
+expErrorLogU T
+expExpectVarsInit T
+expLogAllGet T
+expLogAllSet T
+expLogAppendGet T
+expLogAppendSet T
+expLogChannelClose T
+expLogChannelGet T
+expLogChannelOpen T
+expLogChannelSet T
+expLogDiagU T
+expLogFilenameGet T
+expLogInit T
+expLogInteractionU T
+expLogLeaveOpenGet T
+expLogLeaveOpenSet T
+expLogToStdoutGet T
+expLogToStdoutSet T
+expLogUserGet T
+expLogUserSet T
+expMatchProcess T
+expPrintf T
+expPrintify T
+expPrintifyObj T
+expPrintifyUni T
+expRead T
+expSetBlockModeProc T
+expStateAnyIs T
+expStateCheck T
+expStateCurrent T
+expStateFree T
+expStateFromChannelName T
+expStateToInput T
+expStdinoutGet T
+expStdinoutIs T
+expStdoutLog T
+expStdoutLogU T
+expWaitOnAny T
+expWaitOnOne T
+expWriteBytesAndLogIfTtyU T
+expWriteChars T
+expWriteCharsUni T
+exp_2tcl_returnvalue T
+exp_TclRegError T
+exp_app_exit B 8
+exp_argv0 D 8
+exp_arm_background_channelhandler T
+exp_autoallocpty D 4
+exp_background_channelhandler T
+exp_background_channelhandlers_run_all T
+exp_block_background_channelhandler T
+exp_buffer B 8
+exp_buffer_command_input B 4
+exp_buffer_end B 8
+exp_buffer_shuffle T
+exp_child_exec_prelude B 8
+exp_close T
+exp_close_all T
+exp_close_in_child B 8
+exp_cmdfile B 8
+exp_cmdfilename B 8
+exp_cmdlinecmds B 4
+exp_cmdtype_printable T
+exp_configure_count B 4
+exp_console B 4
+exp_console_set T
+exp_cook T
+exp_create_commands T
+exp_debugfile B 8
+exp_debuglog T
+exp_default_close_on_eof D 4
+exp_default_match_max D 4
+exp_default_parity D 4
+exp_default_rm_nulls D 4
+exp_dev_tty B 4
+exp_disarm_background_channelhandler T
+exp_disarm_background_channelhandler_force T
+exp_disconnect T
+exp_disconnected B 4
+exp_dsleep T
+exp_ecmd_remove_state_direct_and_indirect T
+exp_error T
+exp_errorlog T
+exp_eval_with_one_arg T
+exp_event_disarm_bg T
+exp_event_disarm_fg T
+exp_event_exit B 8
+exp_exit_handlers T
+exp_expectl T
+exp_expectv T
+exp_fexpectl T
+exp_fexpectv T
+exp_flageq_code T
+exp_forked B 4
+exp_free_i T
+exp_free_state T
+exp_free_state_single T
+exp_full_buffer B 4
+exp_get_next_event T
+exp_get_next_event_info T
+exp_get_var T
+exp_getpid B 4
+exp_getptymaster T
+exp_getptyslave T
+exp_i_add_state T
+exp_i_pool B 8
+exp_i_update T
+exp_init_event T
+exp_init_expect_cmds T
+exp_init_interact_cmds T
+exp_init_main_cmds T
+exp_init_most_cmds T
+exp_init_pty T
+exp_init_sig T
+exp_init_spawn_id_vars T
+exp_init_spawn_ids T
+exp_init_stdio T
+exp_init_trap T
+exp_init_trap_cmds T
+exp_init_tty T
+exp_init_tty_cmds T
+exp_init_unit_random T
+exp_interactive B 4
+exp_interp B 8
+exp_interpret_cmdfile T
+exp_interpret_cmdfilename T
+exp_interpret_rcfiles T
+exp_interpreter T
+exp_ioctled_devtty B 4
+exp_is_debugging B 4
+exp_isecho T
+exp_israw T
+exp_logfile B 8
+exp_logfile_all B 4
+exp_loguser D 4
+exp_match B 8
+exp_match_end B 8
+exp_match_max D 4
+exp_new_i T
+exp_new_i_complex T
+exp_new_i_simple T
+exp_new_state T
+exp_nostack_dump B 4
+exp_one_arg_braced T
+exp_onexit_action B 8
+exp_parse_argv T
+exp_pid B 4
+exp_popen T
+exp_printify T
+exp_pty B 8
+exp_pty_error B 8
+exp_pty_exit T
+exp_pty_lock T
+exp_pty_slave_name B 8
+exp_pty_test T
+exp_pty_test_end T
+exp_pty_test_start T
+exp_pty_timeout D 4
+exp_pty_unlock T
+exp_readenv B 96
+exp_reading B 4
+exp_rearm_sigchld T
+exp_remove_nulls D 4
+exp_retoglob T
+exp_slave_control T
+exp_spawnfd T
+exp_spawnl T
+exp_spawnv T
+exp_state_list_pool B 8
+exp_state_prep_for_invalidation T
+exp_stdin_is_tty B 4
+exp_stdout_is_tty B 4
+exp_strftime T
+exp_strict_write B 4
+exp_string_to_signal T
+exp_stty_init B 8
+exp_tcl2_returnvalue T
+exp_tcl_debugger_available B 4
+exp_timeout D 4
+exp_trap_off T
+exp_trap_on T
+exp_tty_break T
+exp_tty_cooked B 44
+exp_tty_cooked_echo T
+exp_tty_current B 44
+exp_tty_echo T
+exp_tty_get_simple T
+exp_tty_original B 44
+exp_tty_raw T
+exp_tty_raw_noecho T
+exp_tty_set T
+exp_tty_set_simple T
+exp_ttycopy D 4
+exp_ttyinit D 4
+exp_unblock_background_channelhandler T
+exp_unused T
+exp_version D 7
+exp_win2_columns_get T
+exp_win2_columns_set T
+exp_win2_rows_get T
+exp_win2_rows_set T
+exp_win2_size_get T
+exp_win2_size_set T
+exp_win_columns_get T
+exp_win_columns_set T
+exp_win_rows_get T
+exp_win_rows_set T
+exp_window_size_get T
+exp_window_size_set T
+expect_info T
+expect_key B 4
+fork_add T
+fork_clear_all T
+fork_init T
+forked_proc_base B 8
+pattern_style B 72
+sigchld_count B 4
+string_case_first T
+string_first T
+string_first_char T
