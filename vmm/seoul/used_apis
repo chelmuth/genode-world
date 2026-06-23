@@ -13,3 +13,4 @@ _/api/report_session
 _/api/rtc_session
 _/api/timer_session
 _/api/usb_session
+_/api/file_system_session

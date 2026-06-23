@@ -5,10 +5,10 @@
  #include "gui.h"
  #include "audio.h"
 -#include "xhci.h"
+ #include "file.h"
  
  
- enum { verbose_debug = false };
-@@ -1011,8 +1010,6 @@
+@@ -1098,8 +1097,6 @@
  		Rtc::Session          *_rtc          { nullptr };
  		Seoul::Audio          *_audio        { nullptr };
  
@@ -17,7 +17,7 @@
  		using Vcpus_active = Genode::Bit_array<64>;
  
  		Vcpu *                 _vcpus[16]    { nullptr };
-@@ -1445,15 +1442,6 @@
+@@ -1588,15 +1585,6 @@
  				if (verbose)
  					Genode::log("device: ", name);
  
@@ -35,9 +35,9 @@
  				if (!dmi) {
 --- a/src/genode/device_model_registry.cc
 +++ b/src/genode/device_model_registry.cc
-@@ -88,8 +88,6 @@
- MODEL_INFO(virtio_gpu,   "mem", "bdf")
- MODEL_INFO(virtio_sound, "mem", "bdf")
+@@ -90,8 +90,6 @@
+ MODEL_INFO(virtio_fs,    "mem", "bdf", "msix", "verbose")
+ MODEL_INFO(virtio_net,   "mem", "bdf", "msix", "verbose")
  
 -MODEL_INFO(xhci, "mem")
 -
