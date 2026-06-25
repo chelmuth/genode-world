@@ -262,8 +262,8 @@ class Vfs_shm::File_system : public Vfs::File_system
 			return false;
 		}
 
-		char const *leaf_path(char const *path) override {
-			return _lookup(path) ? path : nullptr; }
+		bool dir_entry_exists(char const *path) override {
+			return _lookup(path) != nullptr; }
 
 		Opendir_result opendir(char const  *path, bool create,
 		                       Vfs_handle **handle,
