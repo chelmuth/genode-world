@@ -39,6 +39,8 @@ INC_DIR += $(REP_DIR)/src/app/jdk/lib/include \
 
 SRC_CC += os_genode.cpp dummies.cpp
 
+CC_OPT_os_genode += -std=gnu++20
+CC_OPT_dummies   += -std=gnu++20
 
 SRC_CONE += share/vm/c1/c1_Canonicalizer.cpp \
             share/vm/c1/c1_CFGPrinter.cpp \

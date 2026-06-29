@@ -9,6 +9,8 @@ INC_DIR += $(HOTSPOT_BASE)/os_cpu/bsd_zero/vm \
 
 SRC_CC = os_genode_arm.cpp
 
+CC_OPT_os_genode_arm += -std=gnu++20
+
 SRC_CONE = cpu/arm/vm/c1_CodeStubs_arm.cpp \
            cpu/arm/vm/c1_FpuStackSim_arm.cpp \
            cpu/arm/vm/c1_FrameMap_arm.cpp \
