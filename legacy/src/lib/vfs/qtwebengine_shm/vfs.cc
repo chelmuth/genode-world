@@ -411,7 +411,7 @@ extern "C" Genode::Vfs::File_system_factory *vfs_file_system_factory(void)
 
 	struct Factory : Vfs::File_system_factory
 	{
-		Vfs::File_system *create(Vfs::Env &vfs_env, Node const &config) override
+		Vfs::File_system *create(Vfs::Env &vfs_env, Vfs::Parent_fs &, Node const &config) override
 		{
 			return new (vfs_env.alloc()) Vfs_shm::File_system(vfs_env, config);
 		}
