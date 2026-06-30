@@ -496,7 +496,7 @@ void Ssh::Server::incoming_connection(ssh_session s)
 	 * all attempts when this arbritray level is reached.
 	 */
 	enum { MEM_RESERVE = 128u * 1024, };
-	if (_env.pd().avail_ram().value < (size_t)MEM_RESERVE) {
+	if (_env.pd().stats().ram.avail().value < (size_t)MEM_RESERVE) {
 		error("Too many connections");
 		throw -1;
 	}

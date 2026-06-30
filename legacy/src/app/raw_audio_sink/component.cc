@@ -57,7 +57,7 @@ struct Raw_audio::Sink
 	{
 		size_t n = AUDIO_OUT_BUFFER_SIZE;
 		enum { RESERVATION = AUDIO_OUT_BUFFER_SIZE+((sizeof(addr_t)*16)<<10) };
-		Ram_quota avail = _env.pd().avail_ram();
+		Ram_quota avail = _env.pd().stats().ram.avail();
 		if (avail.value > RESERVATION)
 			n = avail.value - RESERVATION;
 		return n;

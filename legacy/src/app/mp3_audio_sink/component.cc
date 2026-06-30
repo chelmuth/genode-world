@@ -121,7 +121,7 @@ struct Mp3_audio_sink::Decoder
 	 */
 	size_t _pcm_buffer_size()
 	{
-		size_t n = _env.pd().avail_ram().value / 2;
+		size_t n = _env.pd().stats().ram.avail().value / 2;
 		if (n > (1<<20))
 			log("internal buffer size is ", n>>20, "MiB");
 		else if (n > (1<<10))
