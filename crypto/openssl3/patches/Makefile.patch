@@ -1,0 +1,30 @@
++++ src/Makefile
+@@ -0,0 +1,28 @@
++all: install/bin/openssl
++
++unexport MAKEFLAGS
++
++TARGET_ARCH := $(shell $(CC) -v 2>&1|awk '/^Target: / { split($$2,triple,"-"); print triple[1]; }')
++
++openssl3/configdata.pm: Makefile openssl3
++	(cd openssl3 && \
++	./Configure BSD-$(TARGET_ARCH) \
++	            no-async \
++	            no-comp \
++	            no-devcryptoeng \
++	            no-docs \
++	            no-dynamic-engine \
++	            no-engine \
++	            no-legacy \
++	            no-tests \
++	            --prefix=/ \
++	            --openssldir=/etc/ssl \
++	)
++
++openssl3/apps/openssl: openssl3/configdata.pm
++	(cd openssl3 && $(MAKE) -j128)
++
++install/bin/openssl: openssl3/apps/openssl
++	(cd openssl3 && \
++	 $(MAKE) install DESTDIR=$(CURDIR)/install \
++	)

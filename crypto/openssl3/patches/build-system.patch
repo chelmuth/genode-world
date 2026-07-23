@@ -1,0 +1,55 @@
++++ src/openssl3/Configurations/10-main.conf
+@@ -1024,9 +1024,7 @@
+         CFLAGS           => picker(default => "-Wall",
+                                    debug   => "-O0 -g",
+                                    release => "-O3"),
+-        cflags           => threads("-pthread"),
+         cppflags         => threads("-D_THREAD_SAFE -D_REENTRANT"),
+-        ex_libs          => add(threads("-pthread")),
+         enable           => add("devcryptoeng"),
+         bn_ops           => "BN_LLONG",
+         thread_scheme    => "pthreads",
+@@ -1084,6 +1082,7 @@
+         bn_ops           => "SIXTY_FOUR_BIT_LONG",
+         asm_arch         => 'x86_64',
+         perlasm_scheme   => "elf",
++        shared_extension => ".lib.so",
+     },
+ 
+     "BSD-aarch64" => {
+@@ -1092,6 +1091,7 @@
+         bn_ops           => "SIXTY_FOUR_BIT_LONG",
+         asm_arch         => 'aarch64',
+         perlasm_scheme   => "linux64",
++        shared_extension => ".lib.so",
+     },
+ 
+     "BSD-ppc" => {
++++ src/openssl3/Configurations/unix-Makefile.tmpl
+@@ -1801,7 +1801,7 @@
+               my $d = "-L" . dirname($_);
+               my $l = basename($_);
+               $l =~ s/^lib//;
+-              $l = "-l" . $l;
++              $l = "-l:lib" . $l . ".lib.so";
+               push @linklibs, $l;
+               push @linkdirs, $d unless grep { $d eq $_ } @linkdirs;
+           }
+@@ -1938,7 +1938,7 @@
+               my $d = "-L" . dirname($_);
+               my $l = basename($_);
+               $l =~ s/^lib//;
+-              $l = "-l" . $l;
++              $l = "-l:lib" . $l . ".lib.so";
+               push @linklibs, $l;
+               push @linkdirs, $d unless grep { $d eq $_ } @linkdirs;
+           }
+@@ -2003,7 +2003,7 @@
+               my $d = "-L" . dirname($_);
+               my $l = basename($_);
+               $l =~ s/^lib//;
+-              $l = "-l" . $l;
++              $l = "-l:lib" . $l . ".lib.so";
+               push @linklibs, $l;
+               push @linkdirs, $d unless grep { $d eq $_ } @linkdirs;
+           }
