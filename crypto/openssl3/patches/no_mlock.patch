@@ -1,0 +1,13 @@
++++ src/openssl3/crypto/mem_sec.c
+@@ -575,9 +575,11 @@
+     if (VirtualLock(sh.arena, sh.arena_size) == FALSE)
+         ret = 2;
+ #else
++#if !defined(__GENODE__)
+     if (mlock(sh.arena, sh.arena_size) < 0)
+         ret = 2;
+ #endif
++#endif
+ #ifndef NO_MADVISE
+     if (madvise(sh.arena, sh.arena_size, MADV_DONTDUMP) < 0)
+         ret = 2;

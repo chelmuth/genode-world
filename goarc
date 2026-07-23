@@ -21,6 +21,8 @@ set version(_/api/libvnc)           0.9.14-2026-04-22
 set version(_/src/libvnc)           0.9.14-2026-04-22
 set version(_/api/nettle)              3.7-2026-05-22
 set version(_/src/nettle)              3.7-2026-05-22
+set version(_/api/openssl3)          3.5.7-2026-07-24
+set version(_/src/openssl3)          3.5.7-2026-07-24
 set version(_/api/pcsc-lite)         2.3.3-2026-04-22
 set version(_/src/pcsc-lite)         2.3.3-2026-04-22
 set version(_/src/rsyslog)        8.2502.0-2026-04-22
