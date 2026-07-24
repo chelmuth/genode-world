@@ -61,3 +61,5 @@ set version(_/pkg/screenshot)       2026-04-22
 set version(_/src/screenshot)       2026-04-22
 
 set version(_/src/seoul)            2026-04-22
+
+set version(_/pkg/test-openssl3)    2026-07-24
