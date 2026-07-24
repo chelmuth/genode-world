@@ -1,0 +1,87 @@
+runtime | ram: 21M | caps: 350 | binary: init
++ requires
+  + nic
+  + rtc
+  + timer
+
++ config
+  + parent-provides
+    + service CPU
+    + service LOG
+    + service PD
+    + service ROM
+    + service File_system
+    + service Nic
+    + service Report
+    + service Rtc
+    + service Timer
+
+  + default-route
+    + any-service
+      + parent
+      + any-child
+
+  + start vfs | caps: 100 | ram: 4M
+    + provides | + service File_system
+    + config
+      + vfs
+        + tar openssl3.tar
+        + dir dev
+          + dir pipe | + pipe
+          + jitterentropy urandom
+          + null
+          + rtc
+          + zero
+        + dir sockets | + lxip | dhcp: yes
+      + policy         | label_prefix: vfs_rom -> | root: /
+      + default-policy                            | root: / | writeable: yes
+    + route
+      + any-service | + parent
+
+  + start vfs_rom | caps: 100 | ram: 8M
+    + binary fs_rom
+    + provides | + service ROM
+    + config
+    + route
+      + service File_system | + child vfs
+      + any-service         | + parent
+
+  + start /bin/openssl | caps: 100 | ram: 8M
+    + exit | propagate: yes
+    + config | ld_verbose: yes
+      + libc | stdin:  /dev/null | stdout: /dev/log  | stderr: /dev/log
+             | rtc:    /dev/rtc  | pipe:   /dev/pipe | socket: /sockets
+             | rng:    /dev/urandom
+      + vfs | + fs
+      + arg | : openssl
+      + arg | : s_client
+      + arg | : -showcerts
+      + arg | : genode.org:443
+    + route
+      + service ROM         | label_suffix: .lib.so    | + parent
+      + service ROM         | label_last: /bin/openssl | + child vfs_rom
+      + service ROM         | label_prefix: /bin       | + child vfs_rom
+      + service File_system                            | + child vfs
+      + any-service
+        + parent
+        + any-child
+
++ content
+  + rom fs_rom
+  + rom init
+  + rom vfs
+
+  + rom ld.lib.so
+  + rom libc.lib.so
+  + rom libcrypto.lib.so
+  + rom libm.lib.so
+  + rom libssl.lib.so
+  + rom lxip.lib.so
+  + rom posix.lib.so
+  + rom vfs_jitterentropy.lib.so
+  + rom vfs.lib.so
+  + rom vfs_lxip.lib.so
+  + rom vfs_pipe.lib.so
+
+  + rom openssl3.tar
+-
