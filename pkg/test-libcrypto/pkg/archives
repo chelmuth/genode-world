@@ -1,0 +1,7 @@
+genodelabs/src/libc
+genodelabs/src/gmp
+genodelabs/src/posix
+genodelabs/src/vfs
+genodelabs/src/vfs_jitterentropy
+_/src/openssl3
+_/src/test-libcrypto
