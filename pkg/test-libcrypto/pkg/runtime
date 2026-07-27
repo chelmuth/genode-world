@@ -1,0 +1,30 @@
+runtime | ram: 8M | caps: 100 | binary: test-libcrypto
++ requires
+  + timer
+
++ config
+  + vfs
+    + dir dev
+      + log
+      + jitterentropy random
+      + inline rtc | : 2026-07-27 12:00
+  + libc | stdout: /dev/log | stderr: /dev/log
+         | rng: /dev/random | rtc: /dev/rtc
+  .
+  . Configure 'rng' as well as 'rtc' as rand_unix will
+  . make use of them indirectly. Better yet provide your
+  . own entropy source.
+  .
+
++ content
+  + rom gmp.lib.so
+  + rom ld.lib.so
+  + rom libc.lib.so
+  + rom libcrypto.lib.so
+  + rom libm.lib.so
+  + rom libssl.lib.so
+  + rom posix.lib.so
+  + rom test-libcrypto
+  + rom vfs.lib.so
+  + rom vfs_jitterentropy.lib.so
+-
