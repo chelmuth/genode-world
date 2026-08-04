@@ -16,6 +16,7 @@
  */
 
 #include <vfs/env.h>
+#include <vfs/vfs_handle.h>
 #include <vfs/file_system.h>
 #include <vfs/file_system_factory.h>
 #include <base/ram_allocator.h>
@@ -94,14 +95,12 @@ class Vfs_shm::File_system : public Vfs::File_system
 		};
 
 
-		class Dataspace_vfs_handle : public Vfs_handle
+		struct Dataspace_vfs_handle : Vfs_handle
 		{
-			public:
+			using Vfs_handle::Vfs_handle;
 
-				using Vfs_handle::Vfs_handle;
-
-				virtual Read_result read(char *dst, file_size count,
-				                         file_size &out_count) = 0;
+			bool read_ready () const override { return false; }
+			bool write_ready() const override { return false; }
 		};
 
 
@@ -117,22 +116,19 @@ class Vfs_shm::File_system : public Vfs::File_system
 
 			public:
 
-				Dataspace_vfs_dir_handle(Directory_service &ds,
-				                   File_io_service &fs,
-				                   Allocator &alloc)
-				: Dataspace_vfs_handle(ds, fs, alloc, 0) { }
+				Dataspace_vfs_dir_handle(Directory_service &ds, Allocator &alloc)
+				: Dataspace_vfs_handle(ds, alloc, 0) { }
 
-				Read_result read(char *dst, file_size count,
-				                 file_size &out_count) override
+				Read_result complete_read(Byte_range_ptr const &dst, size_t &out_count) override
 				{
-					error("Dataspace_vfs_dir_handle::read() called, not implemented");
+					error("Dataspace_vfs_dir_handle::complete_read() called, not implemented");
 
 					out_count = 0;
 
-					if (count < sizeof(Dirent))
+					if (dst.num_bytes < sizeof(Dirent))
 						return READ_ERR_INVALID;
 
-					Dirent &out = *(Dirent*)dst;
+					Dirent &out = *(Dirent*)dst.start;
 
 					out = {
 						.type = Dirent_type::END,
@@ -143,6 +139,11 @@ class Vfs_shm::File_system : public Vfs::File_system
 					out_count = sizeof(Dirent);
 
 					return READ_OK;
+				}
+
+				Ftruncate_result ftruncate(file_size) override
+				{
+					return FTRUNCATE_ERR_NO_PERM;
 				}
 		};
 
@@ -157,27 +158,29 @@ class Vfs_shm::File_system : public Vfs::File_system
 				Dataspace_vfs_file_handle(Dataspace_vfs_file_handle const &);
 				Dataspace_vfs_file_handle &operator = (Dataspace_vfs_file_handle const &);
 
-				Dataspace_vfs_file *_file;
+				Dataspace_vfs_file &_file;
 
 			public:
 
-				Dataspace_vfs_file_handle(Directory_service &ds,
-				                    File_io_service   &fs,
-				                    Allocator &alloc,
-				                    Dataspace_vfs_file *file)
-				: Dataspace_vfs_handle(ds, fs, alloc, 0), _file(file) { }
+				Dataspace_vfs_file_handle(Directory_service &ds, Allocator &alloc,
+				                          Dataspace_vfs_file &file)
+				:
+					Dataspace_vfs_handle(ds, alloc, 0), _file(file)
+				{ }
 
-				Read_result read(char *, file_size, file_size &) override
+				Read_result complete_read(Byte_range_ptr const &, size_t &) override
 				{
 					return READ_ERR_INVALID;
 				}
 
-				Ftruncate_result truncate(file_size len)
+				Ftruncate_result ftruncate(file_size len) override
 				{
-					return _file->truncate(len);
+					try { _file.truncate(len); }
+					catch (Allocator::Out_of_memory) { return FTRUNCATE_ERR_NO_SPACE; }
+					return FTRUNCATE_OK;
 				}
 
-				Dataspace_vfs_file *file() { return _file; }
+				Dataspace_vfs_file &file() { return _file; }
 		};
 
 		Vfs::Env &_env;
@@ -274,7 +277,7 @@ class Vfs_shm::File_system : public Vfs::File_system
 				return OPENDIR_ERR_PERMISSION_DENIED;
 
 			try {
-				*handle = new (alloc) Dataspace_vfs_dir_handle(*this, *this, alloc);
+				*handle = new (alloc) Dataspace_vfs_dir_handle(*this, alloc);
 				return OPENDIR_OK;
 			}
 			catch (Out_of_ram)  { return OPENDIR_ERR_OUT_OF_RAM; }
@@ -310,7 +313,7 @@ class Vfs_shm::File_system : public Vfs::File_system
 			}
 
 			try {
-				*handle = new (alloc) Dataspace_vfs_file_handle(*this, *this, alloc, file);
+				*handle = new (alloc) Dataspace_vfs_file_handle(*this, alloc, *file);
 				file->open_count++;
 				return OPEN_OK;
 			}
@@ -328,12 +331,12 @@ class Vfs_shm::File_system : public Vfs::File_system
 				if (!handle)
 					return;
 
-				Dataspace_vfs_file *file = handle->file();
-				file->open_count--;
+				Dataspace_vfs_file &file = handle->file();
+				file.open_count--;
 
-				if ((file->open_count == 0) && (file->unlink_on_last_close)) {
-					_files.remove(file);
-					destroy(file->alloc(), file);
+				if ((file.open_count == 0) && (file.unlink_on_last_close)) {
+					_files.remove(&file);
+					destroy(file.alloc(), &file);
 				}
 
 				destroy(vfs_handle->alloc(), vfs_handle);
@@ -361,42 +364,6 @@ class Vfs_shm::File_system : public Vfs::File_system
 
 			return UNLINK_OK;
 		}
-
-
-		/************************
-		 ** File I/O interface **
-		 ************************/
-
-		Write_result write(Vfs_handle *, Const_byte_range_ptr const &, size_t &) override
-		{
-			return WRITE_ERR_INVALID;
-		}
-
-		Read_result complete_read(Vfs_handle *, Byte_range_ptr const &, size_t &) override
-		{
-			return READ_ERR_INVALID;
-		}
-
-		bool read_ready (Vfs_handle const &) const override { return false; }
-		bool write_ready(Vfs_handle const &) const override { return false; }
-
-		Ftruncate_result ftruncate(Vfs_handle *vfs_handle, file_size len) override
-		{
-			Dataspace_vfs_file_handle *handle =
-				dynamic_cast<Dataspace_vfs_file_handle *>(vfs_handle);
-
-			if (!handle)
-				return FTRUNCATE_ERR_NO_PERM;
-
-			try { handle->truncate(len); }
-			catch (Allocator::Out_of_memory) { return FTRUNCATE_ERR_NO_SPACE; }
-
-			return FTRUNCATE_OK;
-		}
-
-		/***************************
-		 ** File_system interface **
-		 ***************************/
 
 		static char const *name()   { return "qtwebengine_shm"; }
 		char const *type() override { return "qtwebengine_shm"; }
