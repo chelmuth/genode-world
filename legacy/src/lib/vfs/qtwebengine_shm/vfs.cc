@@ -135,10 +135,9 @@ class Vfs_shm::File_system : public Vfs::File_system
 					Dirent &out = *(Dirent*)dst;
 
 					out = {
-						.fileno = (addr_t)this,
-						.type   = Dirent_type::END,
-						.rwx    = { },
-						.name   = { }
+						.type = Dirent_type::END,
+						.rwx  = { },
+						.name = { }
 					};
 
 					out_count = sizeof(Dirent);
@@ -237,9 +236,8 @@ class Vfs_shm::File_system : public Vfs::File_system
 				out.type = Node_type::DIRECTORY;
 
 			} else if (_lookup(path)) {
-				out.type  = Node_type::CONTINUOUS_FILE;
-				out.rwx   = Node_rwx::rw();
-				out.inode = (unsigned long)_lookup(path);
+				out.type = Node_type::CONTINUOUS_FILE;
+				out.rwx  = Node_rwx::rw();
 			} else {
 				return STAT_ERR_NO_ENTRY;
 			}
