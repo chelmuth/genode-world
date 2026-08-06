@@ -119,14 +119,12 @@ class Vfs_shm::File_system : public Vfs::File_system
 				Dataspace_vfs_dir_handle(Directory_service &ds, Allocator &alloc)
 				: Dataspace_vfs_handle(ds, alloc, 0) { }
 
-				Read_result complete_read(Byte_range_ptr const &dst, size_t &out_count) override
+				Read_result read(Byte_range_ptr const &dst) override
 				{
-					error("Dataspace_vfs_dir_handle::complete_read() called, not implemented");
-
-					out_count = 0;
+					error("Dataspace_vfs_dir_handle::read() called, not implemented");
 
 					if (dst.num_bytes < sizeof(Dirent))
-						return READ_ERR_INVALID;
+						return Read_error::DENIED;
 
 					Dirent &out = *(Dirent*)dst.start;
 
@@ -136,9 +134,7 @@ class Vfs_shm::File_system : public Vfs::File_system
 						.name = { }
 					};
 
-					out_count = sizeof(Dirent);
-
-					return READ_OK;
+					return sizeof(Dirent);
 				}
 
 				Ftruncate_result ftruncate(file_size) override
@@ -168,9 +164,9 @@ class Vfs_shm::File_system : public Vfs::File_system
 					Dataspace_vfs_handle(ds, alloc, 0), _file(file)
 				{ }
 
-				Read_result complete_read(Byte_range_ptr const &, size_t &) override
+				Read_result read(Byte_range_ptr const &) override
 				{
-					return READ_ERR_INVALID;
+					return Read_error::DENIED;
 				}
 
 				Ftruncate_result ftruncate(file_size len) override
