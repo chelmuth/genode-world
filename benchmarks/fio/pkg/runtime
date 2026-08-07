@@ -4,35 +4,35 @@ runtime | ram: 1G | caps: 500 | binary: fio
   + timer
 
 + config
-| + arg | value: fio
-| + arg | value: --rw=randread
-| + arg | value: --name=IOPS-read
-| + arg | value: --bs=4k
-| + arg | value: --direct=1
-| + arg | value: --size=64M
-| + arg | value: --filename=/fiofile
-| + arg | value: --numjobs=1
-| + arg | value: --iodepth=32
-| + vfs
-|   + dir dev
-|    + jitterentropy random
-|    + log
-|    + null
-|    + rtc
-|    + zero
-|    + dir pipe | + pipe
-|   + ram
-| + libc | stdin:  /dev/null | stdout: /dev/log | stderr: /dev/log
-|        | rtc:    /dev/rtc  | pipe:   /dev/pipe
+  + arg | : fio
+  + arg | : --rw=randread
+  + arg | : --name=IOPS-read
+  + arg | : --bs=4k
+  + arg | : --direct=1
+  + arg | : --size=64M
+  + arg | : --filename=/fiofile
+  + arg | : --numjobs=1
+  + arg | : --iodepth=32
+  + vfs
+    + dir dev
+      + jitterentropy random
+      + log
+      + null
+      + rtc
+      + zero
+      + dir pipe | + pipe
+    + ram
+  + libc | stdin:  /dev/null | stdout: /dev/log | stderr: /dev/log
+         | rtc:    /dev/rtc  | pipe:   /dev/pipe
 
 + content
-  + rom | label: fio
-  + rom | label: ld.lib.so
-  + rom | label: libc.lib.so
-  + rom | label: libm.lib.so
-  + rom | label: posix.lib.so
-  + rom | label: vfs.lib.so
-  + rom | label: vfs_jitterentropy.lib.so
-  + rom | label: vfs_pipe.lib.so
-  + rom | label: zlib.lib.so
+  + rom fio
+  + rom ld.lib.so
+  + rom libc.lib.so
+  + rom libm.lib.so
+  + rom posix.lib.so
+  + rom vfs.lib.so
+  + rom vfs_jitterentropy.lib.so
+  + rom vfs_pipe.lib.so
+  + rom zlib.lib.so
 -
