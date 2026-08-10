@@ -1,6 +1,6 @@
 genodelabs/api/base
 genodelabs/api/libc
-genodelabs/api/openssl
+genodelabs/api/openssl3
 genodelabs/api/posix
 genodelabs/api/so
 genodelabs/api/zlib
