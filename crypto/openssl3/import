@@ -12,3 +12,4 @@ PATCHES += patches/aarch64_getauxval.patch
 PATCHES += patches/build-system.patch
 PATCHES += patches/no_mlock.patch
 PATCHES += patches/no_recvmmsg_sendmmsg.patch
+PATCHES += patches/pkgconfig.in.patch

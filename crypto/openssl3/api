@@ -1,1 +1,4 @@
 install/include/openssl/
+.:install/lib/pkgconfig/libcrypto.pc
+.:install/lib/pkgconfig/libssl.pc
+.:install/lib/pkgconfig/openssl.pc
