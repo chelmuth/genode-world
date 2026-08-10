@@ -30,7 +30,7 @@ set version(_/src/openssl3)          3.5.7-2026-08-10
 set version(_/src/openssh)          10.3p1-2026-07-31
 set version(_/api/pcsc-lite)         2.3.3-2026-04-22
 set version(_/src/pcsc-lite)         2.3.3-2026-04-22
-set version(_/src/rsyslog)        8.2502.0-2026-04-22
+set version(_/src/rsyslog)        8.2502.0-2026-08-10
 set version(_/api/sqlite)           3.50.4-2026-04-22
 set version(_/src/sqlite)           3.50.4-2026-06-04
 set version(_/src/sqlite-speedtest) 3.50.4-2026-04-22
