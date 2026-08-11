@@ -119,7 +119,7 @@ class Vfs_shm::File_system : public Vfs::File_system
 				Dataspace_vfs_dir_handle(Directory_service &ds, Allocator &alloc)
 				: Dataspace_vfs_handle(ds, alloc, 0) { }
 
-				Read_result read(Byte_range_ptr const &dst) override
+				Read_result read(At, Byte_range_ptr const &dst) override
 				{
 					error("Dataspace_vfs_dir_handle::read() called, not implemented");
 
@@ -164,7 +164,7 @@ class Vfs_shm::File_system : public Vfs::File_system
 					Dataspace_vfs_handle(ds, alloc, 0), _file(file)
 				{ }
 
-				Read_result read(Byte_range_ptr const &) override
+				Read_result read(At, Byte_range_ptr const &) override
 				{
 					return Read_error::DENIED;
 				}
@@ -183,7 +183,7 @@ class Vfs_shm::File_system : public Vfs::File_system
 
 		List<Dataspace_vfs_file> _files { };
 
-		size_t _num_dirent { 0 };
+		unsigned _num_dirent = 0;
 
 		bool _root(const char *path)
 		{
@@ -243,7 +243,7 @@ class Vfs_shm::File_system : public Vfs::File_system
 			return STAT_OK;
 		}
 
-		file_size num_dirent(char const *path) override
+		unsigned num_dirent(char const *path) override
 		{
 			if (_root(path))
 				return 1;
