@@ -79,18 +79,18 @@ class Vfs_shm::File_system : public Vfs::File_system
 
 				file_size length() { return _length; }
 
-				Ftruncate_result truncate(file_size size)
+				Vfs_handle::Ftruncate_result truncate(file_size size)
 				{
 					if (_length > 0) {
 						error(__PRETTY_FUNCTION__, ": resizing not supported yet");
-						return FTRUNCATE_ERR_NO_PERM;
+						return Vfs_handle::FTRUNCATE_ERR_NO_PERM;
 					}
 
 					_length = size;
 
 					ds_cap = _ram.alloc((size_t)size);
 
-					return FTRUNCATE_OK;
+					return Vfs_handle::FTRUNCATE_OK;
 				}
 		};
 
