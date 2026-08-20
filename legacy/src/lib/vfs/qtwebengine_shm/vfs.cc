@@ -200,7 +200,10 @@ class Vfs_shm::File_system : public Vfs::File_system
 
 	public:
 
-		File_system(Vfs::Env &env, Node const &) : _env(env) { }
+		File_system(Vfs::Env &env, Node const &node)
+		:
+			Vfs::File_system(Ident::from_node(node)), _env(env)
+		{ }
 
 		~File_system() { }
 
@@ -362,6 +365,8 @@ class Vfs_shm::File_system : public Vfs::File_system
 
 		static char const *name()   { return "qtwebengine_shm"; }
 		char const *type() override { return "qtwebengine_shm"; }
+
+		void destruct() override { destroy(_env.alloc(), this); }
 };
 
 
@@ -371,10 +376,14 @@ extern "C" Genode::Vfs::File_system::Factory *vfs_file_system_factory(void)
 
 	struct Factory : Vfs::File_system::Factory
 	{
-		Vfs::File_system *create(Vfs::Env &vfs_env, Vfs::Parent_fs &, Node const &config) override
+		using Fs = Vfs_shm::File_system;
+
+		Instance::Attempt create(Vfs::Env &env, Vfs::Parent_fs &, Node const &config) override
 		{
-			return new (vfs_env.alloc()) Vfs_shm::File_system(vfs_env, config);
+			return { *this, { *new (env.alloc()) Fs(env, config) } };
 		}
+
+		void _free(Instance &instance) override { instance.fs.destruct(); };
 	};
 
 	static Factory f;
