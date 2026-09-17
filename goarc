@@ -33,9 +33,9 @@ set version(_/src/sqlite)           3.50.4-2026-06-04
 set version(_/src/sqlite-speedtest) 3.50.4-2026-04-22
 set version(_/pkg/sqlite-speedtest) 3.50.4-2026-04-22
 
-set version(_/pkg/test-smartcard)   2026-04-22
-set version(_/raw/test-smartcard)   2026-04-22
-set version(_/src/test-smartcard)   2026-04-22
+set version(_/pkg/test-smartcard)   2026-09-17
+set version(_/raw/test-smartcard)   2026-09-17
+set version(_/src/test-smartcard)   2026-09-17
 
 set version(_/pkg/user_keys)        2026-04-22
 set version(_/pkg/mobile_network)   2026-04-22
