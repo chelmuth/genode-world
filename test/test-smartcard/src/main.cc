@@ -16,6 +16,9 @@
 
 #include <winscard.h>
 
+static BYTE expected[] = { 0x62, 0x0A, 0x82, 0x01, 0x38, 0x83, 0x02,
+                           0x3F, 0x00, 0x8A, 0x01, 0x05, 0x90, 0x00 };
+
 int main()
 {
 	LONG rv;
@@ -38,9 +41,12 @@ int main()
 	BYTE pbRecvBuffer[256];
 	DWORD dwRecvLength;
 
+	bool success = false;
+	bool matches = false;
+
 	rv = SCardEstablishContext(SCARD_SCOPE_SYSTEM, NULL, NULL, &hContext);
 
-	printf("SCardEstablishContext: 0x%lx\n", rv);
+	printf("SCardEstablishContext: 0x%x\n", rv);
 
 	dwReaders = SCARD_AUTOALLOCATE;
 	rv = SCardListReaders(hContext, NULL, (LPTSTR)&mszReaders, &dwReaders);
@@ -84,7 +90,7 @@ int main()
 	printf("SCardTransmit: 0x%lx\n", rv);
 
 	printf("Response: ");
-	for (unsigned int i=0; i < dwRecvLength; i++)
+	for (unsigned int i = 0; i < dwRecvLength; i++)
 		printf("%02X ", pbRecvBuffer[i]);
 	printf("\n");
 
@@ -99,6 +105,13 @@ int main()
 	rv = SCardReleaseContext(hContext);
 	
 	printf("SCardReleaseContext: 0x%lx\n", rv);
+
+	matches = memcmp(expected, pbRecvBuffer, dwRecvLength) == 0;
+
+	if (sizeof(expected) == dwRecvLength && matches)
+		success = true;
+
+	printf("\nTest: %s\n", success ? "succeeded" : "failed");
 
 	return 0;
 }

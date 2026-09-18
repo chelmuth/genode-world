@@ -25,7 +25,7 @@ runtime | ram: 128M | caps: 500 | binary: test-smartcard
   + rom | label: vfs_libusb.lib.so
   + rom | label: vfs_pipe.lib.so
   + rom | label: vfs.lib.so
-  + rom | label: pcsclite.lib.so
+  + rom | label: pcsc-lite.lib.so
   + rom | label: posix.lib.so
   + rom | label: ccid.lib.so
   + rom | label: zlib.lib.so
