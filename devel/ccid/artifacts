@@ -1,1 +1,2 @@
 install/ccid.lib.so
+Info.plist.tar: install/Info.plist

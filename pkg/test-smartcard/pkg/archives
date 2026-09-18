@@ -5,7 +5,6 @@ genodelabs/src/vfs
 genodelabs/src/vfs_libusb
 genodelabs/src/vfs_pipe
 genodelabs/src/zlib
-_/raw/test-smartcard
 _/src/ccid
 _/src/pcsc-lite
 _/src/test-smartcard

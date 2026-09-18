@@ -1,5 +1,5 @@
 set version(_/api/ccid)              1.6.2-2026-04-22
-set version(_/src/ccid)              1.6.2-2026-04-22
+set version(_/src/ccid)              1.6.2-2026-09-18
 set version(_/src/chrony)            4.6.1-2026-04-22
 set version(_/pkg/chrony)            4.6.1-2026-04-22
 set version(_/api/curl)             8.21.0-2026-07-27
